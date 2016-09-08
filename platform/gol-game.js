@@ -203,7 +203,7 @@
             var audio = new Audio('https://rawgit.com/HpeAlgoComp/game-of-life/master/platform/music/' + music.file);
             audio.volume = music.volume;
             audio.loop = true;
-            audio.play();
+            // audio.play();
         };
 
         that.playSound = function playSound(sound) {
