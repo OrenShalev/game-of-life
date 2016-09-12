@@ -10,7 +10,9 @@
             that.settings = settings;
             that.htmlHelper = new GolHtmlHelper();
             that.htmlHelper.init(settings);
+            that.srcIndices = [-1, -1];
             that.armies = [];
+            that.isTournament = false;
             that.round = 0;
             that.roundWins = [0, 0];
             that.lastWinner = '';
@@ -25,6 +27,7 @@
                 {file: 'explosion8.mp3', volume: 1},
                 {file: 'explosion9.mp3', volume: 1}    
             ];
+            that.selectSourceSound = {file: 'explosion1.mp3', volume: 1};
             that.startRoundSound = {file: 'explosion1.mp3', volume: 1};
             that.endRoundSound = {file: 'explosion1.mp3', volume: 1};
             that.endGameSound = {file: 'explosion1.mp3', volume: 1};
@@ -43,28 +46,46 @@
             that.playMusic(that.music);
             m = (m + 1) % that.musicFiles.length;
             localStorage.setItem('game-of-life-music-index', m);
+            window.toggleSrc = that.toggleSrc;
             window.loadSources = that.loadSources;
             window.registerArmy = that.registerArmy;
             window.startGame = that.startGame;
         };
 
-        that.loadSource = function loadSource(i) {
-            var srcText, srcElm;
-            srcText = document.getElementById('src-' + i).value;
-            _log('loading source: ' + srcText);
-            if (srcText) {
-                srcElm = document.createElement('script');
-                srcElm.setAttribute('type', 'text/javascript');
-                srcElm.setAttribute('src', srcText);
-                document.getElementsByTagName('head')[0].appendChild(srcElm);
+        that.startGame = function startGame(isTournament) {
+            _dbg('startGame()');
+            that.isTournament = !!isTournament;
+            _log('tournament: ' + that.isTournament);
+            if (that.isTournament) {
+                that.htmlHelper.fadeInLoadSourcesPanel();
+                that.htmlHelper.markSrcLines(that.srcIndices);
+            } else {            
+                that.waitForArmies();
             }
         };
 
+        that.toggleSrc = function toggleSrc(srcInput) {
+            var senderInd = srcInput.attributes['src-ind'].value;
+            if (that.srcIndices[1] === senderInd) {
+                that.srcIndices[1] = -1;
+            } else if (that.srcIndices[0] === senderInd) {
+                that.srcIndices[0] = -1;
+            } else if (that.srcIndices[1] === -1) {
+                that.srcIndices[1] = senderInd;    
+            } else if (that.srcIndices[0] === -1) {
+                that.srcIndices[0] = senderInd;    
+            }
+            that.htmlHelper.markSrcLines(that.srcIndices);
+            that.playSound(that.selectSourceSound);            
+        };
+
         that.loadSources = function loadSources() {
-            document.getElementById('load-src-panel').style.display = 'none';
-            that.loadSource(0);
+            that.playSound(that.startRoundSound);
+            that.htmlHelper.hideLoadSourcesPanel();
+            that.htmlHelper.loadSource(that.srcIndices[0]);
             setTimeout(function() {
-                that.loadSource(1);
+                that.htmlHelper.loadSource(that.srcIndices[1]);
+                that.waitForArmies();
             }, 1000);
         };        
 
@@ -76,11 +97,11 @@
             _dbg('number of armies: ' + that.armies.length);
         };
 
-        that.startGame = function startGame() {
-            _dbg('startGame()');
+        that.waitForArmies = function waitForArmies() {
+            _dbg('waitForArmies()');
             if (that.armies.length < 2) {
                 _log('waiting for armies...');
-                setTimeout(that.startGame, 1000);
+                setTimeout(that.waitForArmies, 500);
             } else {
                 that.startRound();
             }
@@ -140,6 +161,7 @@
             that.playSound(that.endRoundSound);
             if (that.armies[0].power <= 0 && that.armies[1].power <= 0) {
                 _log('draw');
+                that.htmlHelper.endRoundByDraw();
             } else {
                 winnerIndex = (that.armies[1].power <= 0) ? 0 : 1;
                 _log(that.armies[winnerIndex].name + ' wins');
@@ -164,7 +186,7 @@
             _dbg('endGame()');
             that.playSound(that.endGameSound);
             winnerIndex = (that.armies[1].power <= 0) ? 0 : 1;
-            that.htmlHelper.endGame(that.armies, winnerIndex);
+            that.htmlHelper.endGame(that.armies, winnerIndex, that.roundWins);
         };
 
         that.getNewPixels = function getNewPixels() {
