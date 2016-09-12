@@ -66,6 +66,35 @@
         ]);
     }
 
+    // gets pixels array of a spaceship; variant that was originally used where selected column is < data.col/2
+    function getSpaceshipVariant1() {
+        return flatArrayToPixelsArray([
+            1, 0,
+            2, 0,
+            3, 0,
+            0, 1,
+            3, 1,
+            3, 2,
+            3, 3,
+            0, 4,
+            2, 4
+        ]);
+    }
+
+    // gets pixels array of a spaceship; variant that was originally used where selected column is >= data.col/2
+    function getSpaceshipVariant2() {
+        return flatArrayToPixelsArray([
+            0, 0,
+            1, 0,
+            2, 0,
+            0, 1,
+            3, 1,
+            0, 2,
+            0, 3,
+            1, 4,
+            3, 4
+        ]);
+    }
 
     // utilities ---------------------------------------------------------------------------------------------------------
 
@@ -75,78 +104,20 @@
 
     // structures --------------------------------------------------------------------------------------------------------
 
-    function tryPlaceMine(data, col, row) {
-        var pixels = [];
-        var r, c;
-        if (data.budget >= 3) {
-            c = col || getRnd(0, data.cols - 2);
-            r = row || getRnd(20, 80);
-            pixels.push([c, r]);
-            pixels.push([c, r+1]);
-            pixels.push([c+1, r]);
-        }
-        return pixels;
-    }
-
-    function tryPlaceFence(data, col, row) {
-        var pixels = [];
-        var r, c;
-        if (data.budget >= 3) {
-            c = col || fenceLocation;
-            r = row || data.rows - 15;
-            pixels.push([c, r]);
-            pixels.push([c+1, r]);
-            pixels.push([c, r+1]);
-            fenceLocation += 5;
-            if (fenceLocation > data.cols - 2) {
-                fenceLocation = 0;
-            }
-        }
-        return pixels;
-    }
-
-    function tryPlaceGlider(data, col, row) {
-        var pixels = [];
-        var r, c;
-        if (data.budget >= 5) {
-            c = col || getRnd(0, data.cols - 3);
-            r = row || getRnd(0, data.rows - 3);
-            pixels.push([c, r]);
-            pixels.push([c+1, r]);
-            pixels.push([c+2, r]);
-            pixels.push(getRnd(0, 1) === 0 ? [c, r+1] : [c+2, r+1]);
-            pixels.push([c+1, r+2]);
-        }
-        return pixels;
-    }
-
     function tryPlaceSpaceship(data, col, row) {
         var pixels = [];
         var r, c;
         if (data.budget >= 9) {
             c = col || getRnd(0, data.cols - 4);
             r = row || 0;
+
             if (c < data.cols / 2) {
-                pixels.push([c+1, r]);
-                pixels.push([c+2, r]);
-                pixels.push([c+3, r]);
-                pixels.push([c, r+1]);
-                pixels.push([c+3, r+1]);
-                pixels.push([c+3, r+2]);
-                pixels.push([c+3, r+3]);
-                pixels.push([c, r+4]);
-                pixels.push([c+2, r+4]);
+                pixels = getSpaceshipVariant1();
             } else {
-                pixels.push([c, r]);
-                pixels.push([c+1, r]);
-                pixels.push([c+2, r]);
-                pixels.push([c, r+1]);
-                pixels.push([c+3, r+1]);
-                pixels.push([c, r+2]);
-                pixels.push([c, r+3]);
-                pixels.push([c+1, r+4]);
-                pixels.push([c+3, r+4]);
+                pixels = getSpaceshipVariant2();
             }
+            pixels = translatePixels(pixels, c, r);
+
         }
         return pixels;
     }
