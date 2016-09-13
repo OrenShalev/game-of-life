@@ -231,7 +231,7 @@
         that.playSound = function playSound(sound) {
             var audio = new Audio('https://rawgit.com/HpeAlgoComp/game-of-life/master/platform/sound/' + sound.file);
             audio.volume = sound.volume;
-            audio.play();
+            // audio.play();
         };
 
         that.handleScore = function handleScore(scoringPixelsCount) {
