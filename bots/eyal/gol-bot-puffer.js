@@ -276,7 +276,7 @@
 	}
 
 	function executePlan(data, plan) {
-		var pixels = [];
+		var pixels = tryPlacePuffer(data, null, 0);
 		//if (plan[planIndex] === 'glider') {
 		//	pixels = tryPlaceGlider(data);
 		//} else if (plan[planIndex] === 'spaceship') {
@@ -289,11 +289,9 @@
 	}
 
 	var bot = function kingCobra(data) {
-		var pixels = [];
 		var plan;
 		_hiss('budget = ' + data.budget);
-		//plan = determinePlan(data);
-		//pixels = executePlan(data, plan);
+		var pixels = executePlan(data, plan);
 		return pixels;
 	};
 
