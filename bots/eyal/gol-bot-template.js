@@ -6,6 +6,9 @@
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
+	function _hiss(msg) {
+		console.log('COBRAS ' + msg);
+	}
 	// structures --------------------------------------------------------------------------------------------------------
 
 	// budget 9 ------------------------------------------
@@ -48,7 +51,15 @@
 	// budget 7 ------------------------------------------
 
 	function placeEater(pixels, c, r) {
-		//TODO
+		//fishhook
+		pixels.push([c, r+2]);
+		pixels.push([c, r+3]);
+		pixels.push([c+1, r+3]);
+		pixels.push([c+2, r]);
+		pixels.push([c+2, r+1]);
+		pixels.push([c+2, r+2]);
+		pixels.push([c+3, r]);
+
 	}
 	
 	function tryPlaceEater(data, col, row) {
@@ -63,7 +74,13 @@
 	}
 	
 	function placeLoaf(pixels, c, r) {
-		//TODO
+		pixels.push([c, r+2]);
+		pixels.push([c+1, r+1]);
+		pixels.push([c+1, r+3]);
+		pixels.push([c+2, r]);
+		pixels.push([c+2, r+3]);
+		pixels.push([c+3, r+1]);
+		pixels.push([c+3, r+2]);
 	}
 	
 	function tryPlaceLoaf(data, col, row) {
@@ -213,8 +230,35 @@
 
 	// bots --------------------------------------------------------------------------------------------------------------
 
-	var bot = function bot_name(data) {
+	function determinePlan(data) {
+		var plan;
+		//if (data.generation === 1) {
+		//	planIndex = 0;
+		//	fenceLocation = 0;
+		//}
+		//plan = ['glider', 'spaceship'];
+		return plan;
+	}
+
+	function executePlan(data, plan) {
 		var pixels = [];
+		//if (plan[planIndex] === 'glider') {
+		//	pixels = tryPlaceGlider(data);
+		//} else if (plan[planIndex] === 'spaceship') {
+		//	pixels = tryPlaceSpaceship(data, null, 0);
+		//}
+		//if (pixels.length > 0) {
+		//	planIndex = (planIndex + 1) % plan.length;
+		//}
+		return pixels;
+	}
+
+	var bot = function kingCobra(data) {
+		var pixels = [];
+		var plan;
+		_hiss('budget = ' + data.budget);
+		//plan = determinePlan(data);
+		//pixels = executePlan(data, plan);
 		return pixels;
 	};
 
@@ -226,8 +270,8 @@
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
-			name: 'bot_name',
-			icon: 'USER',
+			name: 'COBRAS',
+			icon: 'cobra',
 			cb: bot
 		});
 	}, 2000);

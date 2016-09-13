@@ -62,7 +62,7 @@ function GolHtmlHelper() {
 
 	that.markSrcLines  = function markSrcLines(srcIndices) {
 		var i, elm;
-		for (i = 0; i < 18; i++) {
+		for (i = 0; i < 19; i++) {
 			elm = document.getElementById('src-' + i);
 			if ('' + i === srcIndices[0]) {
 				elm.classList.add('src-0');	
