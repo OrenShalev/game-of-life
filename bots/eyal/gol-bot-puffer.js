@@ -303,7 +303,7 @@
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
-			name: 'COBRAS',
+			name: 'Puffer',
 			icon: 'cobra',
 			cb: bot
 		});

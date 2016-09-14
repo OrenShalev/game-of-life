@@ -296,7 +296,11 @@
 	// bots --------------------------------------------------------------------------------------------------------------
 
 	function determinePlan(data) {
-		var plan = ['century-fence'];
+		var plan = ['century-fence',
+			        'rock-fence',
+			        'glider',
+			        'spaceship', 'spaceship', 'spaceship', 'spaceship', 'spaceship',
+			        'spaceship', 'spaceship', 'spaceship'];
 		if (data.generation === 1) {
 			planIndex = 0;
 			fenceRow = 0;
@@ -313,6 +317,10 @@
 			pixels = tryPlaceFence(data, null, null, 20);
 		} else if (plan[planIndex] === 'century-fence') {
 			pixels = tryPlaceFence(data, null, null, 25);
+		} else if (plan[planIndex] === 'glider') {
+			pixels = tryPlaceGlider(data, data.cols - 10, data.rows - 10);
+		} else if (plan[planIndex] === 'spaceship') {
+			pixels = tryPlaceSpaceship(data);
 		}
 		if (pixels.length > 0) {
 			planIndex = (planIndex + 1) % plan.length;
@@ -336,7 +344,7 @@
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
-			name: 'COBRAS',
+			name: 'Passive-Aggressive',
 			icon: 'cobra',
 			cb: bot
 		});

@@ -328,7 +328,7 @@
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
-			name: 'COBRAS',
+			name: 'template',
 			icon: 'cobra',
 			cb: bot
 		});
