@@ -286,22 +286,21 @@
 	// bots --------------------------------------------------------------------------------------------------------------
 
 	function determinePlan(data) {
-		var plan;// = ['mine-fence', 'rock-fence'];
-		if (data.generation === 1) {
-			planIndex = 0;
-			fenceRow = 0;
-			fenceColumn = 0;
-			fenceLocation = 0;
-		}
+		var plan;
+		//if (data.generation === 1) {
+		//	planIndex = 0;
+		//	fenceLocation = 0;
+		//}
+		//plan = ['glider', 'spaceship'];
 		return plan;
 	}
 
 	function executePlan(data, plan) {
-		var pixels = [];
-		//if (plan[planIndex] === 'mine-fence') {
-		//	pixels = tryPlaceFence(data, null, null, 15);
-		//} else if (plan[planIndex] === 'rock-fence') {
-		//	pixels = tryPlaceFence(data, null, null, 20);
+		var pixels = tryPlaceCentury(data);
+		//if (plan[planIndex] === 'glider') {
+		//	pixels = tryPlaceGlider(data);
+		//} else if (plan[planIndex] === 'spaceship') {
+		//	pixels = tryPlaceSpaceship(data, null, 0);
 		//}
 		//if (pixels.length > 0) {
 		//	planIndex = (planIndex + 1) % plan.length;
@@ -310,11 +309,11 @@
 	}
 
 	var bot = function kingCobra(data) {
-		var pixels = [];
+		//var pixels = [];
 		var plan;
 		//_hiss('budget = ' + data.budget);
 		//plan = determinePlan(data);
-		//pixels = executePlan(data, plan);
+		var pixels = executePlan(data, plan);
 		return pixels;
 	};
 
@@ -322,8 +321,6 @@
 	// init --------------------------------------------------------------------------------------------------------------
 
 	var planIndex = 0;
-	var fenceColumn = 0;
-	var fenceRow = 0;
 	var fenceLocation = 0;
 
 	setTimeout(function registerArmy() {
