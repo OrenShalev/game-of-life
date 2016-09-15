@@ -41,13 +41,41 @@
 		var pixels = [];
 		var r, c;
 		if (data.budget >= 9) {
-			c = col || getRnd(0, data.cols - 4);
+			c = col || getRnd(offenseAreaCounter * (data.cols - 4) / areas, (offenseAreaCounter+1) * (data.cols - 4) / areas);
 			r = row || 0;
 			placeSpaceship(pixels, c, r, c < data.cols / 2); 
+			offenseCounter++;
+			if (offenseCounter == 10) {
+				offenseCounter = 0;
+				offenseAreaCounter++;
+				if (offenseAreaCounter == areas) {
+					offenseAreaCounter = 0;
+				}
+			}
 		}
 		return pixels;
 	}
-	
+	// budget 8 ------------------------------------------
+	function placeAirplane(pixels, c, r) {
+		pixels.push([c, r]);
+		pixels.push([c+1, r]);
+		pixels.push([c+2, r]);
+		pixels.push([c + 1, r+1]);
+		pixels.push([c, r+2]);
+		pixels.push([c + 1, r+2]);
+		pixels.push([c + 2, r+2]);
+		pixels.push([c+1, r+3]);
+	}
+	function tryPlaceAirplane(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 8) {
+			c = col || getRnd(0, data.cols - 4);
+			r = row || getRnd(20, 80);
+			placeAirplane(pixels, c, r);
+		}
+		return pixels;
+	}
 	// budget 7 ------------------------------------------
 
 	function placeEater(pixels, c, r) {
@@ -129,7 +157,7 @@
 		var pixels = [];
 		var r, c;
 		if (data.budget >= 5) {
-			c = col || getRnd(0, data.cols - 3);
+			c = col || getRnd(offenseAreaCounter * (data.cols - 4) / areas, (offenseAreaCounter+1) * (data.cols - 4) / areas);
 			r = row || 0; //getRnd(0, data.rows - 3);
 			placeGlider(pixels, c, r, getRnd(0, 1) === 0);
 		}
@@ -325,6 +353,8 @@
 		fenceRow = 0;
 		simpleFenceBuilt = false;
 		planIndex = 0;
+		offenseAreaCounter = 0;
+		offenseCounter = 0;
 	}
 	var bot = function kingCobra(data) {
 		if (data.generation == 1) {
@@ -342,6 +372,8 @@
 
 	// init --------------------------------------------------------------------------------------------------------------
 
+	var offenseAreaCounter = 0;
+	var offenseCounter = 0;
 	var planIndex = 0;
 	var fenceColumn = 0;
 	var fenceRow = 0;
