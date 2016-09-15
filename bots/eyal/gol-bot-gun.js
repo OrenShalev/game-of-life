@@ -11,6 +11,59 @@
 	}
 	// structures --------------------------------------------------------------------------------------------------------
 
+	// budget 36 ------------------------------------------
+
+	function placeGun(pixels, c, r) {
+		// Gosper glider gun
+		// right side
+		placeBlock(pixels, c + 34, r +5);
+		pixels.push([c+20, r+4]);
+		pixels.push([c+20, r+5]);
+		pixels.push([c+20, r+6]);
+		pixels.push([c+21, r+4]);
+		pixels.push([c+21, r+5]);
+		pixels.push([c+21, r+6]);
+		pixels.push([c+22, r+3]);
+		pixels.push([c+22, r+7]);
+		pixels.push([c+23, r+2]);
+		pixels.push([c+23, r+3]);
+		pixels.push([c+23, r+7]);
+		pixels.push([c+23, r+8]);
+		// left side
+		placeBlock(pixels, c, r +3);
+		pixels.push([c+10, r+2]);
+		pixels.push([c+10, r+3]);
+		pixels.push([c+10, r+4]);
+		pixels.push([c+11, r+1]);
+		pixels.push([c+11, r+5]);
+		pixels.push([c+12, r]);
+		pixels.push([c+12, r+6]);
+		pixels.push([c+13, r]);
+		pixels.push([c+13, r+6]);
+		pixels.push([c+14, r+3]);
+		pixels.push([c+15, r+1]);
+		pixels.push([c+15, r+5]);
+		pixels.push([c+16, r+2]);
+		pixels.push([c+16, r+3]);
+		pixels.push([c+16, r+4]);
+		pixels.push([c+17, r+3]);
+	}
+
+	function tryPlaceGun(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 36) {
+			c = col || gunColumn;
+			r = row || data.rows - 12;
+			placeGun(pixels, c, r);
+			gunColumn += 40;
+			if (gunColumn > data.cols - 36) {
+				gunColumn = 0;
+			}
+		}
+		return pixels;
+	}
+
 	// budget 16 ------------------------------------------
 
 	function placePuffer(pixels, c, r) {
@@ -173,6 +226,47 @@
 
 	// budget 5 ------------------------------------------
 
+	function placePlus(pixels, c, r) {
+		pixels.push([c, r+1]);
+		pixels.push([c+1, r]);
+		pixels.push([c+1, r+1]);
+		pixels.push([c+1, r+2]);
+		pixels.push([c+2, r+1]);
+	}
+
+	function tryPlacePlus(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 5) {
+			c = col || getRnd(0, data.cols - 3);
+			r = row || getRnd(0, data.rows - 3);
+			placeGlider(pixels, c, r);
+		}
+		return pixels;
+	}
+
+	// This is by far the most active polyomino with less than six cells: all the others stabilize in at most 10 generations,
+	// but the R-pentomino does not do so until generation 1103,
+	// by which time it has a population of 116.
+	function placeRpentomino(pixels, c, r) {
+		pixels.push([c, r+1]);
+		pixels.push([c+1, r]);
+		pixels.push([c+1, r+1]);
+		pixels.push([c+1, r+2]);
+		pixels.push([c+2, r+2]);
+	}
+
+	function tryPlaceRpentomino(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 5) {
+			c = col || getRnd(0, data.cols - 3);
+			r = row || getRnd(0, data.rows - 3);
+			placeGlider(pixels, c, r);
+		}
+		return pixels;
+	}
+
 	function placeGlider(pixels, c, r, isLeft) {
 		pixels.push([c, r]);
 		pixels.push([c+1, r]);
@@ -268,26 +362,16 @@
 		return pixels;
 	}
 
-	function tryPlaceFence(data, col, row, dmz) {
+	function tryPlaceFence(data, col, row) {
 		var pixels = [];
 		var r, c;
-		c = col || fenceColumn;
-		r = row || data.rows - dmz - fenceRow;
-		if (dmz === 15) {
-			pixels = tryPlaceMine(data, c, r);
-		} else if (dmz === 20) {
-			pixels = tryPlaceRock(data, c, r);
-		} else {
-			pixels = tryPlaceCentury(data, c, r);
-		}
-		if (pixels.length > 0) {
-			fenceColumn = fenceColumn + dmz - 10;
-			if (fenceColumn > data.cols - 2) {
-				fenceColumn = 0;
-				fenceRow += dmz;
-			}
-			if (fenceRow > data.rows - 30) {
-				fenceRow = 0;
+		if (data.budget >= 5) {
+			c = col || fenceLocation;
+			r = row || data.rows - 40;
+			placeRpentomino(pixels, c, r);
+			fenceLocation += 10;
+			if (fenceLocation > data.cols - 3) {
+				fenceLocation = 0;
 			}
 		}
 		return pixels;
@@ -297,37 +381,30 @@
 	// bots --------------------------------------------------------------------------------------------------------------
 
 	function determinePlan(data) {
-
 		var plan;
 		if (data.generation < data.cols) {
-			// passive
-			plan = ['mine-fence', 'rock-fence', 'century-fence'];
+			plan = ['r-fence'];
+		} else if (data.generation > data.cols && data.generation < data.cols *4) {
+			plan = ['gun'];
 		} else {
-			// passive - aggressive
-			plan = ['century-fence',
-				'glider','spaceship', 'spaceship', 'spaceship', 'spaceship',
-				'spaceship', 'spaceship', 'spaceship'];
+			plan = ['r-fence'];
 		}
 		if (data.generation === 1) {
 			planIndex = 0;
 			fenceRow = 0;
 			fenceColumn = 0;
+			fenceLocation = 0;
+			gunColumn = 0;
 		}
 		return plan;
 	}
 
 	function executePlan(data, plan) {
 		var pixels = [];
-		if (plan[planIndex] === 'mine-fence') {
-			pixels = tryPlaceFence(data, null, null, 15);
-		} else if (plan[planIndex] === 'rock-fence') {
-			pixels = tryPlaceFence(data, null, null, 20);
-		} else if (plan[planIndex] === 'century-fence') {
-			pixels = tryPlaceFence(data, null, null, 25);
-		} else if (plan[planIndex] === 'glider') {
-			pixels = tryPlaceGlider(data, data.cols - 10, data.rows - 10);
-		} else if (plan[planIndex] === 'spaceship') {
-			pixels = tryPlaceSpaceship(data);
+		if (plan[planIndex] === 'r-fence') {
+			pixels = tryPlaceFence(data);
+		} else if (plan[planIndex] === 'gun') {
+			pixels = tryPlaceGun(data);
 		}
 		if (pixels.length > 0) {
 			planIndex = (planIndex + 1) % plan.length;
@@ -345,13 +422,14 @@
 	// init --------------------------------------------------------------------------------------------------------------
 
 	var planIndex = 0;
-	var fenceRow = 0;
 	var fenceColumn = 0;
+	var fenceRow = 0;
 	var fenceLocation = 0;
+	var gunColumn = 0;
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
-			name: 'Passive-Aggressive',
+			name: 'Gun!',
 			icon: 'cobra',
 			cb: bot
 		});

@@ -11,6 +11,59 @@
 	}
 	// structures --------------------------------------------------------------------------------------------------------
 
+	// budget 36 ------------------------------------------
+
+	function placeGun(pixels, c, r) {
+		// Gosper glider gun
+		// right side
+		placeBlock(pixels, c + 34, r +5);
+		pixels.push([c+20, r+4]);
+		pixels.push([c+20, r+5]);
+		pixels.push([c+20, r+6]);
+		pixels.push([c+21, r+4]);
+		pixels.push([c+21, r+5]);
+		pixels.push([c+21, r+6]);
+		pixels.push([c+22, r+3]);
+		pixels.push([c+22, r+7]);
+		pixels.push([c+23, r+2]);
+		pixels.push([c+23, r+3]);
+		pixels.push([c+23, r+7]);
+		pixels.push([c+23, r+8]);
+		// left side
+		placeBlock(pixels, c, r +3);
+		pixels.push([c+10, r+2]);
+		pixels.push([c+10, r+3]);
+		pixels.push([c+10, r+4]);
+		pixels.push([c+11, r+1]);
+		pixels.push([c+11, r+5]);
+		pixels.push([c+12, r]);
+		pixels.push([c+12, r+6]);
+		pixels.push([c+13, r]);
+		pixels.push([c+13, r+6]);
+		pixels.push([c+14, r+3]);
+		pixels.push([c+15, r+1]);
+		pixels.push([c+15, r+5]);
+		pixels.push([c+16, r+2]);
+		pixels.push([c+16, r+3]);
+		pixels.push([c+16, r+4]);
+		pixels.push([c+17, r+3]);
+	}
+
+	function tryPlaceGun(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 36) {
+			c = col || gunColumn;
+			r = row || 0;
+			placeGun(pixels, c, r);
+			gunColumn += 40;
+			if (gunColumn > data.cols - 36) {
+				gunColumn = 0;
+			}
+		}
+		return pixels;
+	}
+
 	// budget 16 ------------------------------------------
 
 	function placePuffer(pixels, c, r) {
@@ -172,6 +225,48 @@
 	}
 
 	// budget 5 ------------------------------------------
+
+	function placePlus(pixels, c, r) {
+		pixels.push([c, r+1]);
+		pixels.push([c+1, r]);
+		pixels.push([c+1, r+1]);
+		pixels.push([c+1, r+2]);
+		pixels.push([c+2, r+1]);
+	}
+
+	function tryPlacePlus(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 5) {
+			c = col || getRnd(0, data.cols - 3);
+			r = row || getRnd(0, data.rows - 3);
+			placeGlider(pixels, c, r);
+		}
+		return pixels;
+	}
+
+	// This is by far the most active polyomino with less than six cells: all the others stabilize in at most 10 generations,
+	// but the R-pentomino does not do so until generation 1103,
+	// by which time it has a population of 116.
+	function placeRpentomino(pixels, c, r) {
+		pixels.push([c, r+1]);
+		pixels.push([c+1, r]);
+		pixels.push([c+1, r+1]);
+		pixels.push([c+1, r+2]);
+		pixels.push([c+2, r+2]);
+	}
+
+	function tryPlaceRpentomino(data, col, row) {
+		var pixels = [];
+		var r, c;
+		if (data.budget >= 5) {
+			c = col || getRnd(0, data.cols - 3);
+			r = row || getRnd(0, data.rows - 3);
+			placeGlider(pixels, c, r);
+		}
+		return pixels;
+	}
+
 	function placeGlider(pixels, c, r, isLeft) {
 		pixels.push([c, r]);
 		pixels.push([c+1, r]);
@@ -292,6 +387,7 @@
 			fenceRow = 0;
 			fenceColumn = 0;
 			fenceLocation = 0;
+			gunColumn = 0;
 		}
 		return plan;
 	}
@@ -325,6 +421,7 @@
 	var fenceColumn = 0;
 	var fenceRow = 0;
 	var fenceLocation = 0;
+	var gunColumn = 0;
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
