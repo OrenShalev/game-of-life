@@ -11,7 +11,7 @@
 	function tryPlaceRoysAirplane(data, col, row) {
 		var pixels = [];
 		var r, c;
-		if (data.budget >= 3) {
+		if (data.budget >= 8) {
 			c = col || getRnd(0, data.cols - 2);
 			r = row || getRnd(20, 80);
 			pixels.push([c, r]);
