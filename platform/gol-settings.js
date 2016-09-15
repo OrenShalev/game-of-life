@@ -19,5 +19,8 @@ function GolSettings() {
 
 	that.millisEndRoundBoardFreeze = 3000;
 	that.millisEndRoundMessageTime = 3000;
-	that.winRoundLimit = 3;
+
+	// Declare winner after at least one of these conditions are met:
+	that.winRoundLimit = 3; // Player has this many wins.
+	that.TotalRoundLimit = 100; // Played this many rounds (winner is player who won more). Obviously need to raise the value of winRoundLimit to have effect.
 }

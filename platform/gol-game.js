@@ -169,7 +169,9 @@
                 that.roundWins[winnerIndex]++;
                 that.htmlHelper.endRound(that.round, that.roundWins, that.armies, winnerIndex);
             }
-            if (that.roundWins[0] < that.settings.winRoundLimit && that.roundWins[1] < that.settings.winRoundLimit) {
+            var playerHasEnoughWins = that.roundWins[0] < that.settings.winRoundLimit && that.roundWins[1] < that.settings.winRoundLimit;
+            var playedEnoughRounds = that.roundWins[0] + that.roundWins[1] >= that.settings.TotalRoundLimit;
+            if (playerHasEnoughWins || playedEnoughRounds) {
                 setTimeout(that.restartRound, that.settings.millisEndRoundMessageTime);  
             } else {
                 setTimeout(that.endGame, that.settings.millisEndRoundMessageTime);    
