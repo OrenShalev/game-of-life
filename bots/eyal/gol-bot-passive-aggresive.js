@@ -304,9 +304,9 @@
 			plan = ['mine-fence', 'rock-fence', 'century-fence'];
 		} else {
 			// passive - aggressive
-			plan = ['century-fence',
-				'glider','spaceship', 'spaceship', 'spaceship', 'spaceship',
-				'spaceship', 'spaceship', 'spaceship'];
+			plan = ['rock-fence',
+				'glider','spaceship', 'rock-fence', 'glider', 'spaceship', 'rock-fence', 'glider',
+				'spaceship', 'rock-fence', 'glider', 'spaceship'];
 		}
 		if (data.generation === 1) {
 			planIndex = 0;
@@ -325,7 +325,7 @@
 		} else if (plan[planIndex] === 'century-fence') {
 			pixels = tryPlaceFence(data, null, null, 25);
 		} else if (plan[planIndex] === 'glider') {
-			pixels = tryPlaceGlider(data, data.cols - 10, data.rows - 10);
+			pixels = tryPlaceGlider(data);
 		} else if (plan[planIndex] === 'spaceship') {
 			pixels = tryPlaceSpaceship(data);
 		}
