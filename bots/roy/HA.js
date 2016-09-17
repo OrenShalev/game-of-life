@@ -25,10 +25,10 @@
 			pixels.push([c+5, r+1]);
 			pixels.push([c+6, r]);
 
-			if (haLastCol > 400) {
+			// prepare for next haSecret.
+			haLastCol += 20;
+			if (haLastCol >= 400) {
 				haLastCol = 0
-			} else {
-				haLastCol += 20;
 			}
 		}
 		return pixels;
@@ -63,10 +63,9 @@
 				pixels.push([c+3, r+4]);
 			}
 
-			if (spaceShipLastCol > 400) {
+			spaceShipLastCol += 56;
+			if (spaceShipLastCol >= 400) {
 				spaceShipLastCol = 0
-			} else {
-				spaceShipLastCol += 56;
 			}
 		}
 		return pixels;
@@ -74,7 +73,7 @@
 
 	// bots --------------------------------------------------------------------------------------------------------------
 
-	var bot = function bot1(data) {
+	var ha = function bot1(data) {
 		var pixels = [];
 
 		if (data.generation < 200) {
@@ -91,9 +90,9 @@
 
 	// init --------------------------------------------------------------------------------------------------------------
 
-	var haLastCol = 0
-	var spaceShipLastCol = 0
-	var bot = {name: 'HA!', icon:'bot', cb: bot};
+	var haLastCol = 0;
+	var spaceShipLastCol = 0;
+	var bot = {name: 'HA!', icon:'bot', cb: ha};
 
 	setTimeout(function registerArmy() {
 		window.registerArmy({
