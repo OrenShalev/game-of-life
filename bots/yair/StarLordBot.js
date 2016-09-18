@@ -56,23 +56,23 @@
 		return pixels;
 	}
 	// budget 8 ------------------------------------------
-	function placeAirplane(pixels, c, r) {
-		pixels.push([c, r]);
-		pixels.push([c+1, r]);
-		pixels.push([c+2, r]);
-		pixels.push([c + 1, r+1]);
-		pixels.push([c, r+2]);
-		pixels.push([c + 1, r+2]);
-		pixels.push([c + 2, r+2]);
-		pixels.push([c+1, r+3]);
-	}
-	function tryPlaceAirplane(data, col, row) {
+	function tryPlaceRoysAirplane(data, col, row) {
 		var pixels = [];
 		var r, c;
 		if (data.budget >= 8) {
-			c = col || getRnd(0, data.cols - 4);
+			c = col || getRnd(0, data.cols - 2);
 			r = row || getRnd(20, 80);
-			placeAirplane(pixels, c, r);
+			pixels.push([c, r]);
+			pixels.push([c+1, r]);
+			pixels.push([c+2, r]);
+			pixels.push([c+3, r]);
+
+			pixels.push([c+1, r+1]);
+			pixels.push([c+1, r-1]);
+
+			pixels.push([c+3, r+1]);
+			pixels.push([c+3, r-1]);
+			
 		}
 		return pixels;
 	}

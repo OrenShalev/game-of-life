@@ -21,16 +21,22 @@ function GolHtmlHelper() {
 		that.addCssRule('* {box-sizing: border-box;}');
 		that.addCssRule('html {height: 100%; font-size: 8px;}');
 		that.addCssRule('body {height: 100%; margin: 0; overflow: hidden; background-color: #202020; color: #fff; font-family: individigital, sans-serif;}');
-		that.addCssRule('#load-src-panel {margin-top: 10px; margin-left: calc(50% - 200px); width: 400px; text-align: center; opacity: 0; transition: 1s all ease;}}');
+		that.addCssRule('#load-src-panel {margin-top: 10px; margin-left: calc(50% - 200px); width: 400px; text-align: center; opacity: 0; transition: 1s all ease;}');
 		that.addCssRule('.load-src-title {text-align: left; color: #fff; font-size: 16px;}');
 		that.addCssRule('.load-src-msg {text-align: left; font-size: 7px; color: #333; transition: 1s color ease;}');
 		that.addCssRule('.load-src-input {outline: none !important; margin-bottom: 1px; width: 100%; height: 8px; border: none; background-color: #000; padding-left: 3px; font-family: visitor, consolas, monospace, sans-serif; font-size: 9px; color: #666; cursor: pointer; transition: 1s all ease;}');
 		that.addCssRule('#load-src-button {margin-top: 8px; width: 50px; height: 15px; border: 1px solid #666; background: #666; color: #fff; font-family: individigital, sans-serif; font-size: 7px; cursor: pointer; outline: none; opacity: 0; transition: 1s opacity ease;}');
-		that.addCssRule('#gol-container {height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;}');
+		that.addCssRule('#army-vs-army-panel {margin-left: calc(50% - 200px); width: 400px; text-align: center; opacity: 0; transition: 4s all ease;}');
+		that.addCssRule('.army-vs-army-line {margin-top: 30px;}');
+		that.addCssRule('.army-vs-army-vs {margin-top: 30px; color: #666;}');
+		that.addCssRule('#gol-container {position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;}');
+		that.addCssRule('#time-display {position: absolute; left: 7px; top: 5px; font-size: 8px; color: #666;');
 		that.addCssRule('#gol-canvas {background-color: #000; cursor: crosshair; margin: 5px;}');
 		for (i = 0; i < 2; i++) {
 			that.addCssRule('.src-' + i + ' {margin-bottom: 1px; width: 100%; border: none; background-color: #000; padding-left: 3px; font-family: visitor, consolas, monospace, sans-serif; font-size: 9px; color: #' + that.colorsHex[i] + ';}');
-			that.addCssRule('#gol-army-line-' + i + ' {display: flex; justify-content: space-between; align-items: center; height: 10px; line-height: 10px; width: ' + that.cols + 'px; position:relative;}');
+			that.addCssRule('#army-vs-army-img-' + i + ' {display: inline-block; height: 60px;}');
+			that.addCssRule('#army-vs-army-name-' + i + ' {display: inline-block; position: relative; top: -25px; color: #' + that.colorsHex[i] + '}');
+			that.addCssRule('#gol-army-line-' + i + ' {display: flex; justify-content: space-between; align-items: center; text-align: left; height: 10px; line-height: 10px; width: ' + that.cols + 'px; position:relative;}');
 			that.addCssRule('#gol-army-name-' + i + ' {height: 10px; width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #' + that.colorsHex[i] + ';}');
 			that.addCssRule('#gol-army-stats-' + i + ' {height: 10px; display: flex; align-items: center;}');
 			that.addCssRule('#gol-army-score-' + i + ' {height: 10px; color: #' + that.colorsHex[i] + ';}');
@@ -60,48 +66,62 @@ function GolHtmlHelper() {
 		document.getElementById('load-src-panel').style['opacity'] = 1;
 	};
 
-	that.markSrcLines  = function markSrcLines(srcIndices) {
+	that.markSrcLines = function markSrcLines(srcIndices) {
 		var i, elm;
-		for (i = 0; i < 21; i++) {
+		for (i = 0; i < 16; i++) {
 			elm = document.getElementById('src-' + i);
 			if ('' + i === srcIndices[0]) {
-				elm.classList.add('src-0');	
-				elm.classList.remove('src-1');	
+				elm.classList.add('src-0');
+				elm.classList.remove('src-1');
 			} else if ('' + i === srcIndices[1]) {
-				elm.classList.add('src-1');	
-				elm.classList.remove('src-0');	
+				elm.classList.add('src-1');
+				elm.classList.remove('src-0');
 			} else {
 				elm.classList.remove('src-0');
-				elm.classList.remove('src-1');	
+				elm.classList.remove('src-1');
 			}
 		}
 		document.getElementById('load-src-msg-1').style['color'] = srcIndices[1] === -1 ? '#' + that.colorsHex[1] : '#333';
 		document.getElementById('load-src-msg-0').style['color'] = srcIndices[0] === -1 && srcIndices[1] !== -1 ? '#' + that.colorsHex[0] : '#333';
-		document.getElementById('load-src-button').style['opacity'] = (srcIndices[1] !== -1 && srcIndices[0] !== -1) ? '1' : '0';		
+		document.getElementById('load-src-button').style['opacity'] = (srcIndices[1] !== -1 && srcIndices[0] !== -1) ? '1' : '0';
 	};
 
 	that.loadSource = function loadSource(index) {
-        var srcText, srcElm;
-        srcText = document.getElementById('src-' + index).value;
-        _log('loading source: ' + srcText);
-        if (srcText) {
-            srcElm = document.createElement('script');
-            srcElm.setAttribute('type', 'text/javascript');
-            srcElm.setAttribute('src', srcText);
-            document.getElementsByTagName('head')[0].appendChild(srcElm);
-        }
-     };
+		var srcText, srcElm;
+		srcText = document.getElementById('src-' + index).value;
+		_log('loading source: ' + srcText);
+		if (srcText) {
+			srcElm = document.createElement('script');
+			srcElm.setAttribute('type', 'text/javascript');
+			srcElm.setAttribute('src', srcText);
+			document.getElementsByTagName('head')[0].appendChild(srcElm);
+		}
+	};
 
 	that.hideLoadSourcesPanel = function hideLoadSourcesPanel() {
 		document.getElementById('load-src-panel').style['display'] = 'none';
 	};
 
+	that.showArmyVsArmyPanel = function showArmyVsArmyPanel(armies) {
+		var i;
+		for (i = 0; i < 2; i++) {
+			document.getElementById('army-vs-army-img-' + i).setAttribute('src', 'platform/icons/' + armies[i].icon + '.png');
+			document.getElementById('army-vs-army-name-' + i).innerHTML = armies[i].name;
+		}
+		document.getElementById('army-vs-army-panel').style['opacity'] = '1';
+	};
+
+	that.hideArmyVsArmyPanel = function hideArmyVsArmyPanel() {
+		document.getElementById('army-vs-army-panel').style['display'] = 'none';
+	};
+
 	that.drawUserInterface = function drawUserInterface(armies) {
 		var container, canvas;
 		container = that.addContainer();
+		that.addTimeDisplay(container);
 		that.addArmyLine(container, 1, armies[1]);
 		canvas = that.addCanvas(container, 'gol-canvas', that.cols, that.rows);
-  		that.addArmyLine(container, 0, armies[0]);
+		that.addArmyLine(container, 0, armies[0]);
 		that.ctx = canvas.getContext('2d');
 	};
 
@@ -122,7 +142,7 @@ function GolHtmlHelper() {
 		textNode = document.createTextNode(army.name);
 		armyName.appendChild(textNode);
 
-		armyLine.appendChild(armyName);		
+		armyLine.appendChild(armyName);
 
 		armyStats = document.createElement('div');
 		armyStats.setAttribute('id', 'gol-army-stats-' + index);
@@ -152,10 +172,19 @@ function GolHtmlHelper() {
 		return container.appendChild(canvas);
 	};
 
+	that.addTimeDisplay = function addTimeDisplay(container) {
+		var timeDisplay, textNode;
+		timeDisplay = document.createElement('div');
+		timeDisplay.setAttribute('id', 'time-display');
+		textNode = document.createTextNode('59');
+		timeDisplay.appendChild(textNode);
+		return container.appendChild(timeDisplay);
+	};
+
 	that.drawArrayToCanvas = function drawArrayToCanvas(array, newPixels, newPixelsAge, scoringPixelCount, armies, roundEnded) {
 		var i, j, k, x, y, r, g, b, a, maxAge, maxDistance, multiplier, distance, index, imgData;
 		imgData = that.ctx.createImageData(that.cols, that.rows);
-		
+
 		// regular matrix
 		for (y = 0; y < that.rows; y++) {
 			for (x = 0; x < that.cols; x++) {
@@ -211,7 +240,7 @@ function GolHtmlHelper() {
 		}
 
 		// new pixels mark
-		maxAge = 5;		
+		maxAge = 5;
 		for (i = 0; i < newPixels.length; i++) {
 			for (j = 0; j < newPixels[i].length; j++) {
 				if (newPixelsAge[i] <= maxAge) {
@@ -241,7 +270,7 @@ function GolHtmlHelper() {
 							}
 						}
 					}
-				}	
+				}
 			}
 		}
 
@@ -261,21 +290,34 @@ function GolHtmlHelper() {
 	that.shake = function shake() {
 		var shakeIndex = Math.floor(Math.random() * that.shakes.length);
 		document.getElementById('gol-canvas').className = that.shakes[shakeIndex] + ' shake-constant';
-            setTimeout(function () {
-                document.getElementById('gol-canvas').className = '';
-            }, 500);
+		setTimeout(function () {
+			document.getElementById('gol-canvas').className = '';
+		}, 500);
+	};
+
+	that.updateTimeDisplay = function updateTimeDisplay(secondsLeft) {
+		var minutes, seconds, timeStr;
+		minutes = Math.floor(secondsLeft / 60);
+		seconds = secondsLeft - minutes * 60;
+		timeStr = (minutes >= 10 ? '' + minutes : '0' + minutes) + ':' + (seconds >= 10 ? '' + seconds : '0' + seconds);
+		document.getElementById('time-display').innerHTML = timeStr;
+		document.getElementById('time-display').style['display'] = 'block';
+	};
+
+	that.hideTimeDisplay = function hideTimeDisplay(time) {
+		document.getElementById('time-display').style['display'] = 'none';
 	};
 
 	that.updateScore = function updateScore(armyIndex, armyPower, scoringPixels) {
 		var score, scoreText, powerWidth;
-		document.getElementById('gol-army-score-' + armyIndex).style['color'] = (scoringPixels === 0) ? '#' + that.colorsHex[armyIndex] : '#fff';		
+		document.getElementById('gol-army-score-' + armyIndex).style['color'] = (scoringPixels === 0) ? '#' + that.colorsHex[armyIndex] : '#fff';
 		document.getElementById('gol-army-power-' + armyIndex).style['background-color'] = (scoringPixels === 0) ? '#' + that.colorsHex[armyIndex] : '#fff';
 		score = Math.round(armyPower);
 		if (score === 0 && armyPower > 0) {
 			score = 1;
 		}
 		scoreText = '' + score;
-		document.getElementById('gol-army-score-' + armyIndex).innerHTML = scoreText;		
+		document.getElementById('gol-army-score-' + armyIndex).innerHTML = scoreText;
 		powerWidth = Math.round(armyPower / that.settings.powerMaxValue * that.powerBarMaxWidth);
 		if (powerWidth === 0 && armyPower > 0) {
 			powerWidth = 1;
@@ -286,30 +328,29 @@ function GolHtmlHelper() {
 	that.endRoundByDraw = function endRoundByDraw()  {
 		var i;
 		for (i = 0; i < 2; i++) {
-			document.getElementById('gol-army-score-' + i).style['color'] = '#' + that.colorsHex[i];		
+			document.getElementById('gol-army-score-' + i).style['color'] = '#' + that.colorsHex[i];
 			document.getElementById('gol-army-power-' + i).style['background-color'] = '#' + that.colorsHex[i];
 		}
 		that.ctx.clearRect(0, 0, that.cols, that.rows);
 		that.ctx.textAlign = 'center';
 		that.ctx.fillStyle = 'rgb(66, 66, 66)';
 		that.ctx.font = '14px visitor';
-		that.ctx.fillText('DRAW', that.cols / 2, that.rows / 2);	
+		that.ctx.fillText('DRAW', that.cols / 2, that.rows / 2);
 	};
 
 	that.endRound = function endRound(round, roundWins, armies, winnerIndex)  {
-		var i, isWinner;
+		var i;
+		that.hideTimeDisplay();
 		for (i = 0; i < 2; i++) {
-			document.getElementById('gol-army-score-' + i).style['color'] = '#' + that.colorsHex[i];		
+			document.getElementById('gol-army-score-' + i).style['color'] = '#' + that.colorsHex[i];
 			document.getElementById('gol-army-power-' + i).style['background-color'] = '#' + that.colorsHex[i];
 		}
 		that.ctx.clearRect(0, 0, that.cols, that.rows);
 		that.ctx.textAlign = 'center';
 		that.ctx.fillStyle = 'rgb(' + armies[1].color[0] + ',' + armies[1].color[1] + ',' + armies[1].color[2] + ')';
-		isWinner = winnerIndex === 1;
 		that.ctx.font = (winnerIndex === 1) ? '24px visitor' : '14px visitor';
 		that.ctx.fillText(armies[1].name + ' : ' + roundWins[1], that.cols / 2, that.rows / 2 - 12);
 		that.ctx.fillStyle = 'rgb(' + armies[0].color[0] + ',' + armies[0].color[1] + ',' + armies[0].color[2] + ')';
-		isWinner = winnerIndex === 0;
 		that.ctx.font = (winnerIndex === 0) ? '24px visitor' : '14px visitor';
 		that.ctx.fillText(armies[0].name + ' : ' + roundWins[0], that.cols / 2, that.rows / 2 + 12);
 	};
@@ -319,13 +360,13 @@ function GolHtmlHelper() {
 		var loserRoundCount = roundWins[winnerIndex*-1+1];
 		document.getElementById('gol-army-stats-0').style['visibility'] = 'hidden';
 		document.getElementById('gol-army-stats-1').style['visibility'] = 'hidden';
-	    that.ctx.clearRect(0, 0, that.cols, that.rows);	    
-	    that.ctx.textAlign = 'center';
-	    that.ctx.font = '14px visitor';
-	   	that.ctx.fillStyle = 'rgb(66, 66, 66)';
-	    that.ctx.fillText('winner ( ' + winnerRoundCount + ' : ' + loserRoundCount + ' )', that.cols / 2, that.rows / 2 - 12);
-	    that.ctx.font = '24px visitor';
-	    that.ctx.fillStyle = 'rgb(' + armies[winnerIndex].color[0] + ',' + armies[winnerIndex].color[1] + ',' + armies[winnerIndex].color[2] + ')';
+		that.ctx.clearRect(0, 0, that.cols, that.rows);
+		that.ctx.textAlign = 'center';
+		that.ctx.font = '14px visitor';
+		that.ctx.fillStyle = 'rgb(255, 255, 255)';
+		that.ctx.fillText('winner ( ' + winnerRoundCount + ' : ' + loserRoundCount + ' )', that.cols / 2, that.rows / 2 - 12);
+		that.ctx.font = '24px visitor';
+		that.ctx.fillStyle = 'rgb(' + armies[winnerIndex].color[0] + ',' + armies[winnerIndex].color[1] + ',' + armies[winnerIndex].color[2] + ')';
 		that.ctx.fillText(armies[winnerIndex].name, that.cols / 2, that.rows / 2 + 12);
 	};
 

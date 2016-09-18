@@ -7,20 +7,17 @@ function GolSettings() {
 	that.cols = 400;
 	that.rows = 200;
 
+	that.powerMaxValue = 100;
+	that.powerHitQuantum = 5;
+
 	that.initialBudget = 0;
 	that.budgetTickQuantum = 1;
 
-	that.powerMaxValue = 100;
-	that.millisBetweenPowerTimeReductions = 1000;
-	that.powerTimeQuantum = 1;
-	that.millisMaxRoundDuration = that.powerMaxValue * that.millisBetweenPowerTimeReductions / that.powerTimeQuantum;
+	that.secondsMaxRoundDuration = 60;
 
-	that.powerHitQuantum = 5;
+	that.millisArmyVsArmyMessageDuration = 3000;
+	that.millisEndRoundBoardFreezeDuration = 3000;
+	that.millisEndRoundMessageDuration = 3000;
 
-	that.millisEndRoundBoardFreeze = 3000;
-	that.millisEndRoundMessageTime = 3000;
-
-	// Declare winner after at least one of these conditions are met:
-	that.winRoundLimit = 3; // Player has this many wins.
-	that.TotalRoundLimit = 100; // Played this many rounds (winner is player who won more). Obviously need to raise the value of winRoundLimit to have effect.
+	that.winRoundLimit = 3;
 }
