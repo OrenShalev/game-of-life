@@ -12,8 +12,8 @@
 		var pixels = [];
 		var r, c;
 		if (data.budget >= 3) {
-			c = col || getRnd(0, data.cols - 2);
-			r = row || getRnd(20, 80);
+			c = (col === 0) ? 0 : col || getRnd(0, data.cols - 2);
+			r = (row === 0) ? 0 : row || getRnd(20, 80);
 			pixels.push([c, r]);
 			pixels.push([c, r+1]);
 			pixels.push([c+1, r]);
@@ -164,7 +164,7 @@
 	];
 	//var b = (localStorage.getItem('game-of-life-training-bot-index') || 0) % bots.length;
 	var b = getRnd(0, bots.length-1);
-    var bot = bots[b];        
+  var bot = bots[b];
     //b = (b + 1) % bots.length;
     //localStorage.setItem('game-of-life-training-bot-index', b);	
 	setTimeout(function registerArmy() {

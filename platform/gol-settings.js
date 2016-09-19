@@ -2,6 +2,8 @@ function GolSettings() {
 
 	var that = this;
 
+	that.isTournament = false;
+
 	that.colorsRGB = [ [0x11, 0xFF, 0xCC], [0xFF, 0x33, 0x33] ];
 
 	that.cols = 400;
@@ -20,4 +22,6 @@ function GolSettings() {
 	that.millisEndRoundMessageDuration = 3000;
 
 	that.winRoundLimit = 3;
+
+	that.remotePlatformLocationRawGit = 'https://rawgit.com/HpeAlgoComp/game-of-life/master/platform';
 }
