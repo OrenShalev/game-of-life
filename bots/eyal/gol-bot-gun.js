@@ -15,50 +15,60 @@
 
 	function placeGun(pixels, c, r) {
 		// Gosper glider gun
-		// right side
-		placeBlock(pixels, c + 34, r +5);
-		pixels.push([c+20, r+4]);
-		pixels.push([c+20, r+5]);
-		pixels.push([c+20, r+6]);
-		pixels.push([c+21, r+4]);
-		pixels.push([c+21, r+5]);
-		pixels.push([c+21, r+6]);
-		pixels.push([c+22, r+3]);
-		pixels.push([c+22, r+7]);
-		pixels.push([c+23, r+2]);
-		pixels.push([c+23, r+3]);
-		pixels.push([c+23, r+7]);
-		pixels.push([c+23, r+8]);
-		// left side
-		placeBlock(pixels, c, r +3);
-		pixels.push([c+10, r+2]);
-		pixels.push([c+10, r+3]);
-		pixels.push([c+10, r+4]);
-		pixels.push([c+11, r+1]);
-		pixels.push([c+11, r+5]);
-		pixels.push([c+12, r]);
-		pixels.push([c+12, r+6]);
-		pixels.push([c+13, r]);
-		pixels.push([c+13, r+6]);
-		pixels.push([c+14, r+3]);
-		pixels.push([c+15, r+1]);
-		pixels.push([c+15, r+5]);
-		pixels.push([c+16, r+2]);
-		pixels.push([c+16, r+3]);
-		pixels.push([c+16, r+4]);
-		pixels.push([c+17, r+3]);
+		// left to right
+		placeBlock(pixels, c, r +11);
+		// -- special block
+		pixels.push([c+8, r+11]);
+		pixels.push([c+8, r+12]);
+		pixels.push([c+9, r+11]);
+		pixels.push([c+9, r+13]);
+		pixels.push([c+10, r+12]);
+		pixels.push([c+10, r+13]);
+		// -- glider up 16
+		pixels.push([c+16, r+9]);
+		pixels.push([c+16, r+10]);
+		pixels.push([c+16, r+11]);
+		pixels.push([c+17, r+11]);
+		pixels.push([c+18, r+10]);
+		// -- special block
+		pixels.push([c+22, r+13]);
+		pixels.push([c+22, r+14]);
+		pixels.push([c+23, r+13]);
+		pixels.push([c+23, r+15]);
+		pixels.push([c+24, r+14]);
+		pixels.push([c+24, r+15]);
+		// -- glider left 24
+		pixels.push([c+24, r+1]);
+		pixels.push([c+24, r+2]);
+		pixels.push([c+25, r]);
+		pixels.push([c+25, r+2]);
+		pixels.push([c+26, r+2]);
+		// block
+		placeBlock(pixels, c+34, r +13);
+		// -- glider up 35
+		pixels.push([c+35, r+5]);
+		pixels.push([c+35, r+6]);
+		pixels.push([c+35, r+7]);
+		pixels.push([c+36, r+7]);
+		pixels.push([c+37, r+6]);
+
 	}
+
+	var stopGuns = false;
 
 	function tryPlaceGun(data, col, row) {
 		var pixels = [];
-		var r, c;
-		if (data.budget >= 36) {
-			c = col || gunColumn;
-			r = row || data.rows - 12;
-			placeGun(pixels, c, r);
-			gunColumn += 40;
-			if (gunColumn > data.cols - 36) {
-				gunColumn = 0;
+		if (!stopGuns) {
+			var r, c;
+			if (data.budget >= 35) {
+				c = col || gunColumn;
+				r = row || data.rows - 40;
+				placeGun(pixels, c, r);
+				gunColumn += 40;
+				if (gunColumn > data.cols - 38) {
+					gunColumn = 0;
+				}
+				stopGuns = true;
 			}
 		}
 		return pixels;
@@ -366,12 +376,16 @@
 		var pixels = [];
 		var r, c;
 		if (data.budget >= 5) {
-			c = col || fenceLocation;
-			r = row || data.rows - 40;
+			c = col || fenceColumn;
+			r = row || fenceRow;
 			placeRpentomino(pixels, c, r);
-			fenceLocation += 10;
-			if (fenceLocation > data.cols - 3) {
-				fenceLocation = 0;
+			fenceColumn += 10;
+			if (fenceColumn > data.cols - 3) {
+				fenceColumn = 0;
+				fenceRow += 30;
+			}
+			if (fenceRow > data.rows - 40) {
+				fenceRow = 40;
 			}
 		}
 		return pixels;
@@ -381,17 +395,17 @@
 	// bots --------------------------------------------------------------------------------------------------------------
 
 	function determinePlan(data) {
-		var plan;
-		if (data.generation < data.cols) {
-			plan = ['r-fence'];
-		} else if (data.generation > data.cols && data.generation < data.cols *4) {
-			plan = ['gun'];
-		} else {
-			plan = ['r-fence'];
-		}
+		var plan= ['gun'];
+		//if (data.generation < data.cols) {
+		//	plan = ['r-fence'];
+		//} else if (data.generation > data.cols && data.generation < data.cols *2) {
+		//	plan = ['gun'];
+		//} else {
+		//	plan = ['r-fence'];
+		//}
 		if (data.generation === 1) {
 			planIndex = 0;
-			fenceRow = 0;
+			fenceRow = 40;
 			fenceColumn = 0;
 			fenceLocation = 0;
 			gunColumn = 0;
@@ -400,12 +414,12 @@
 	}
 
 	function executePlan(data, plan) {
-		var pixels = [];
-		if (plan[planIndex] === 'r-fence') {
-			pixels = tryPlaceFence(data);
-		} else if (plan[planIndex] === 'gun') {
-			pixels = tryPlaceGun(data);
-		}
+		var pixels = tryPlaceGun(data);
+		//if (plan[planIndex] === 'r-fence') {
+		//	pixels = tryPlaceFence(data);
+		//} else if (plan[planIndex] === 'gun') {
+		//	pixels = tryPlaceGun(data);
+		//}
 		if (pixels.length > 0) {
 			planIndex = (planIndex + 1) % plan.length;
 		}
