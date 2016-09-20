@@ -106,8 +106,8 @@ function tryPlaceGlider(data) {
 
 	var sideFlag = 0;
 	var lastCol = 0;
-    var bot = {name: 'HA!', icon:'bot', cb: bot};        
-    	
+    var bot = {name: 'HA-Oren!', icon:'bot', cb: planBotCB};
+
 	setTimeout(function registerArmy() {
 		window.registerArmy({
 			name: bot.name,
@@ -115,5 +115,160 @@ function tryPlaceGlider(data) {
 			cb: bot.cb
 		});
 	}, 2000);
+
+	////////
+
+
+
+	function planBotCB({budget, generation, cols, rows}) {
+		if (budget >= nextElement.length) {
+			let el = nextElement;
+			nextElement = battlePlan.getNextElement();
+			return el;
+		}
+		else {
+			return [];
+		}
+	}
+	// let botbot = { name: };
+
+	class Plan {
+		// this.elements = [];
+		constructor() {
+			this.elements = [];
+			this.nextElementIdx = 0;
+		}
+
+		getElements() {
+			return this.elements;
+		}
+
+		addElements(elements) {
+			this.elements.push(...elements);
+			return this;
+		}
+
+		concatPlan(otherPlan) {
+			this.addElements(otherPlan.getElements());
+			return this;
+		}
+
+		hasMoreElements() {
+			return this.nextElementIdx < this.elements.length;
+		}
+
+		getNextElement() {
+			return this.elements[this.nextElementIdx++];
+		}
+
+		reverse() {
+			this.elements.reverse();
+			return this;
+		}
+
+		randomizeStartElement() {
+			let startAt = Math.floor(Math.random() * this.elements.length);
+			this.elements = this.elements.slice(startAt).concat(this.elements.slice(0, startAt));
+			return this;
+		}
+
+		reset() {
+			this.nextElementIdx = 0;
+			return this;
+		}
+	}
+
+	// Plan for a pattern that repeats horizontally from left to right.
+	class RepeatPlan extends Plan {
+		constructor(pattern = [], repeatEveryXPixels = 10) {
+			super();
+			let elements = [];
+			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO 400?
+				elements.push(translatePixels(pattern, x, 0));
+			}
+			this.addElements(elements);
+		}
+	}
+	
+	class GliderRightLine extends RepeatPlan {
+		constructor() {
+			super(getGliderRight(), 100);
+		}
+
+	}
+
+	let p = new RepeatPlan(getGliderRight()).concatPlan(new RepeatPlan(getGliderLeft()).reverse());
+	// let p = new GliderRightLine().concatPlan(new GliderRightLine().reverse());
+	debugger;
+
+	// init plan
+	let battlePlan__ = new GliderRightLine().concatPlan(new GliderRightLine().reverse()); // change as you wish
+	let battlePlan = new RepeatPlan(getGliderRight()).concatPlan(new RepeatPlan(getGliderLeft()).reverse()); // change as you wish
+	let nextElement = battlePlan.getNextElement();
+
+	// Helper functions I (Oren) found useful. Currently as a separate file. I suggest that anyone who works on a file
+// copy-pastes this, I think it can only make our lives easier. When someone copies a file and changes it -- these
+// will be there and we won't need to copy this.
+
+	var rnd = Math.random,
+		floor = Math.floor;
+
+// random int between 'from' and 'to'-1. For example, randomIntRange(0, 10) returns int between 0 and 9, (20, 60)-->20..59.
+	function randomIntInRange(from, to) {
+		return floor(rnd() * (to - from - 1)) + from;
+	}
+
+// lets you create array of arrays easily: flatArrayToPixelsArray([0, 1, 2, 3]) --> [ [0, 1], [2, 3] ]
+	function flatArrayToPixelsArray(flat) {
+		var pixels = [];
+		for (var i = 0; i < flat.length; i = i + 2) {
+			pixels.push([
+				flat[i],
+				flat[i + 1]
+			]);
+		}
+		return pixels;
+	}
+
+// translates an array of pixels. Create pattern starting at [0, 0], then pass to this to move to desired location.
+	function translatePixels(pixels, columns = 0, rows = 0) {
+		return pixels.map(function translatePixel(pixel) {
+			return [
+				pixel[0] + columns,
+				pixel[1] + rows
+			];
+		});
+	}
+
+// gets pixels array of a blocker, starting at 0,0
+	function getBlocker() {
+		return flatArrayToPixelsArray([
+			0, 0,
+			0, 1,
+			1, 0,
+			1, 1
+		]);
+	}
+
+// gets pixels array of a blocker which will move right, starting at 0,0
+	function getGliderLeft() {
+		return flatArrayToPixelsArray([
+			0, 0,
+			1, 0,
+			2, 0,
+			0, 1,
+			1, 2
+		]);
+	}
+// gets pixels array of a blocker which will move left, starting at 0,0
+	function getGliderRight() {
+		return flatArrayToPixelsArray([
+			0, 0,
+			1, 0,
+			2, 0,
+			2, 1,
+			1, 2
+		]);
+	}
 
 })();
