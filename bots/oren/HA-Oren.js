@@ -176,6 +176,10 @@ function tryPlaceGlider(data) {
 			this.nextElementIdx = 0;
 			return this;
 		}
+
+		getRequiredBudget() {
+			return this.elements.reduce((element, pixels) => pixels.concat(element), []).length
+		}
 	}
 
 	// Plan for a pattern that repeats horizontally from left to right.
