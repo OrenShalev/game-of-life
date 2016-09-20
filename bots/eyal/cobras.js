@@ -6,8 +6,8 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function _hiss(msg) {
-        console.log('COBRAS ' + msg);
+    function _hiss(data, msg) {
+        console.log('COBRAS: [generation ' + data.generation + '] ' + msg);
     }
 
     function checkColumn(data, range) {
@@ -20,24 +20,25 @@
 
     }
 
-    function advanceLocation(data, range, delta) {
-        lastColumn += (direction * delta);
+    function advanceLocation(data, range, deltaColumn, deltaRow) {
+        var rowDelta = deltaRow || rowChange;
+        lastColumn += (direction * deltaColumn);
         // change direction
         if (lastColumn > data.cols - range) {
             direction = -1;
-            lastColumn = data.cols - delta;
-            lastRow += rowChange;
+            lastColumn = getRnd(data.cols/2,  data.cols - range);
+            lastRow += rowDelta;
         } else if (lastColumn < 0) {
             direction = 1;
-            lastColumn = delta;
-            lastRow += rowChange;
+            lastColumn = getRnd(range, data.cols/2 - range);
+            lastRow += rowDelta;
         }
         // make sure that we dont invade the dmz
         if (lastRow > dmz - 5) {
             lastRow = 0;
         }
 
-        _hiss('next snake on ' + lastColumn + ', ' + lastRow);
+        //_hiss('next snake on ' + lastColumn + ', ' + lastRow);
     }
 
     // structures --------------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@
             var c = lastColumn;
             var r = lastRow;
 
-            _hiss('placing capeCobra on ' + c + ', ' + r);
+            _hiss(data, 'placing capeCobra on ' + c + ', ' + r);
             pixels.push([c, r]);
             pixels.push([c + 1, r]);
             pixels.push([c + 2, r]);
@@ -77,7 +78,7 @@
             var c = lastColumn;
             var r = lastRow;
 
-            _hiss('placing spittingCobra on ' + c + ', ' + r);
+            _hiss(data, 'placing spittingCobra on ' + c + ', ' + r);
             pixels.push([c + 1, r]);
             pixels.push([c + 2, r]);
             pixels.push([c + 3, r]);
@@ -96,14 +97,14 @@
     function tryPlaceNajaMossambica(data) {
         var pixels = [];
         // we skip a cycle to allow space
-        if (data.budget >= 18) {
+        if (data.budget >= 9) {
 
             checkColumn(data, 3);
 
             var c = lastColumn;
             var r = lastRow;
 
-            _hiss('placing spittingCobra on ' + c + ', ' + r);
+            _hiss(data, 'placing spittingCobra on ' + c + ', ' + r);
             pixels.push([c + 1, r]);
             pixels.push([c + 2, r]);
             pixels.push([c + 3, r]);
@@ -114,7 +115,7 @@
             pixels.push([c, r + 4]);
             pixels.push([c + 2, r + 4]);
 
-            advanceLocation(data, 3, 0);
+            advanceLocation(data, 3, 0, 10);
         }
         return pixels;
     }
@@ -128,7 +129,7 @@
             var c = lastColumn;
             var r = dmz;
 
-            _hiss('placing burrowingCobra on ' + c + ', ' + r);
+            _hiss(data, 'placing burrowingCobra on ' + c + ', ' + r);
             pixels.push([c, r]);
             pixels.push([c + 1, r - 1]);
             pixels.push([c + 2, r - 2]);
@@ -177,11 +178,11 @@
         } else {
             pixels = tryPlaceNajaNivea(data);
         }
-        if (pixels.length > 0) {
-            _hiss('strike! snake is ' + snake + ', cost is ' + pixels.length);
+        //if (pixels.length > 0) {
+        //    _hiss('strike! snake is ' + snake + ', cost is ' + pixels.length);
         //} else {
         //    _hiss('wait... budget is ' + data.budget + ', generation is ' + data.generation)
-        }
+        //}
         return pixels;
     }
 
