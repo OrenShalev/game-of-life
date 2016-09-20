@@ -8,36 +8,45 @@
 
 	// structures --------------------------------------------------------------------------------------------------------
 
-function tryPlaceGlider(data) {
-
-	var pixels = [];
+	function tryPlaceGuard(data, col, row) {
+		var pixels = [];
 		if (data.budget >= 5) {
-			
-			var c = lastCol;
-			var r = 0;
+		
+			var c = col;
+			var r = row;
 
 			pixels.push([c, r]);
 			pixels.push([c+1, r]);
-			pixels.push([c+2, r]);
-			pixels.push(sideFlag ? [c, r+1] : [c+2, r+1]);
-			pixels.push([c+1, r+2]);
-
-			if (sideFlag == 0) {
-				lastCol += 15;
-			} else {
-				lastCol -= 15;
-			}
+			pixels.push([c-1, r]);
+			pixels.push([c, r+1]);
+			pixels.push([c, r-1]);
 		}
 		return pixels;
 	}
 
-	function tryPlaceSpaceship(data) {
+	function tryPlaceGlider(data, col, row) {
+		var pixels = [];
+		if (data.budget >= 5) {
+
+			var c = col;
+			var r = row;
+
+			pixels.push([c, r]);
+			pixels.push([c+1, r]);
+			pixels.push([c+2, r]);
+			pixels.push(data.generation % 2 ? [c, r+1] : [c+2, r+1]);
+			pixels.push([c+1, r+2]);
+		}
+		return pixels;
+	}
+
+	function tryPlaceSpaceship(data, col, row) {
 		var pixels = [];
 		if (data.budget >= 9) {
-			
-			var c = lastCol;
-			var r = 0;
-			
+		
+			var c = col;
+			var r = row;
+	
 			pixels.push([c+1, r]);
 			pixels.push([c+2, r]);
 			pixels.push([c+3, r]);
@@ -47,22 +56,16 @@ function tryPlaceGlider(data) {
 			pixels.push([c+3, r+3]);
 			pixels.push([c, r+4]);
 			pixels.push([c+2, r+4]);
-
-			if (sideFlag == 0) {
-				lastCol += 25;
-			} else {
-				lastCol -= 25;
-			}
 		}
 		return pixels;
 	}
 
-	function tryPlaceHaSecret(data) {
+	function tryPlaceHaSecret(data, col, row) {
 		var pixels = [];
 		if (data.budget >= 7) {
 			
-			var c = lastCol;
-			var r = 70;
+			var c = col;
+			var r = row;
 
 			pixels.push([c, r]);
 			pixels.push([c+1, r-1]);
@@ -70,13 +73,9 @@ function tryPlaceGlider(data) {
 			pixels.push([c+3, r-3]);
 			pixels.push([c+4, r-3]);
 			pixels.push([c+5, r-3]);
-			pixels.push([c+5, r-2]);
+			pixels.push([c+5, r-2]);	
 
-			if (lastCol > 400) {
-				lastCol = 0
-			} else {
-				lastCol += 30;
-			}
+			lastCol += 40;		
 		}
 		return pixels;
 	}
@@ -84,28 +83,53 @@ function tryPlaceGlider(data) {
 	// bot --------------------------------------------------------------------------------------------------------------
 
 	var bot = function bot(data) {
-		
-		if (lastCol > 400) {
-			sideFlag = 1;
-		} else if (lastCol < 0) {
-			sideFlag = 0;
-		}
 
 		var pixels = [];
-		if (data.generation < 100) {
-			pixels = tryPlaceHaSecret(data);
-		} else if (sideFlag == 0) {
-			pixels = tryPlaceSpaceship(data);
+		
+		if (data.generation === 0) {
+			enforceGuard = 0;
+			lastCol = 20;
+		}
+
+		if (lastCol >= 381) {
+			lastCol = 20;
+		}
+
+		if (data.generation < 75) {
+			pixels = tryPlaceHaSecret(data, lastCol, 70);
+		} else if (data.generation < 250) {
+			if (data.generation % 2) {
+				pixels = tryPlaceSpaceship(data, 0, 0);
+			} else {
+				pixels = tryPlaceSpaceship(data, 395, 0);
+			}
+		} else if (data.generation < 350) {
+			pixels = tryPlaceHaSecret(data, lastCol, 5);
 		} else {
-			pixels = tryPlaceGlider(data);
+	
+			if (enforceGuard > 50 && enforceGuard < 100) {
+				pixels = tryPlaceHaSecret(data, getRnd(5,395), getRnd(10,80));
+				if (pixels.length > 0) {
+					enforceGuard ++;
+				}
+			} else {
+				if (enforceGuard > 100) {
+					enforceGuard = 0;
+				}
+				pixels = tryPlaceSpaceship(data, lastCol, 0);
+				if (pixels.length > 0) {
+					lastCol += 40;
+					enforceGuard ++;
+				}
+			}
 		}
 		return pixels;
 	};
 
 	// init --------------------------------------------------------------------------------------------------------------
 
-	var sideFlag = 0;
-	var lastCol = 0;
+	var enforceGuard = 0;
+	var lastCol = 20;
     var bot = {name: 'HA!', icon:'bot', cb: bot};        
     	
 	setTimeout(function registerArmy() {
