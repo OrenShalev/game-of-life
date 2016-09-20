@@ -106,7 +106,7 @@ function tryPlaceGlider(data) {
 
 	var sideFlag = 0;
 	var lastCol = 20;
-    var bot = {name: 'HA!_old', icon:'bot', cb: bot};        
+    var bot = {name: 'HA!', icon:'bot', cb: bot};        
     	
 	setTimeout(function registerArmy() {
 		window.registerArmy({
