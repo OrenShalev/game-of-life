@@ -12,6 +12,7 @@ function _dbg(msg) {
 
 function _err(msg) {
 	console.log('ERR ' + msg);
+	alert('ERR ' + msg);
 }
 
 // function calcBrightness(hex) {
