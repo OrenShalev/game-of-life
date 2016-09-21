@@ -82,9 +82,33 @@
 			var arr = this.elements; // Just to make the code simpler.
 			for (let i = arr.length; i > 0; i--) {
 				let idx = Math.floor(Math.random() * i);
-				[ arr[i-1], arr[idx] ] = [ arr[idx], arr[i-1] ];
+				[ arr[i-1], arr[idx] ] = [ arr[idx], arr[i-1] ]; // Simple swap.
 			}
 			return this;
+		}
+
+		loop(times = 3) {
+			let plan = new Plan();
+			for (let i = 0; i < times; i++) {
+				plan.concatPlan(this);
+			}
+			return plan;
+		}
+
+		static loop(plan = new Plan(), times = 3) {
+			let newPlan = new Plan();
+			for (let i = 0; i < times; i++) {
+				newPlan.concatPlan(plan);
+			}
+			return newPlan;
+		}
+
+		static concat(...plans) {
+			let newPlan = new Plan();
+			for (let plan of plans) {
+				newPlan.concatPlan(plan);
+			}
+			return newPlan;
 		}
 	}
 
@@ -108,15 +132,13 @@
 	let battlePlan = new RepeatPlan( getGliderRight() )
 		.concatPlan( new RepeatPlan( getGliderLeft() ).reverse() ).randomize();
 	
-	let haPlan = new RepeatPlan(translatePixels(getHA(), [, 70]), 30)
-		.concatPlan(new RepeatPlan(getSpaceship(), 25))
-		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
-		.concatPlan(new RepeatPlan(getSpaceship(), 25))
-		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
-		.concatPlan(new RepeatPlan(getSpaceship(), 25))
-		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
-		.concatPlan(new RepeatPlan(getSpaceship(), 25))
-		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse());
+	let haDefense = new RepeatPlan(translatePixels(getHA(), [, 70]), 30);
+	let haAttack = new RepeatPlan(getSpaceship(), 25).concatPlan(
+		new RepeatPlan(getGliderRight(), 15).reverse()
+	);
+	let haAttackLoop = Plan.loop(haAttack, 10);
+	let haPlan = Plan.concat(haDefense, haAttackLoop);
+
 	battlePlan = haPlan;
 
 	let nextElement = battlePlan.getNextElement();
