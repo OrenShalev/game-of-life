@@ -1,44 +1,4 @@
 (function() {
-	// --- MC Cobra bot ---
-	
-	// Set up battle plan:
-	// For example, line of right gliders from left to right, then left gliders from right to left.
-	// Change as you wish
-	let battlePlan = new RepeatPlan( getGliderRight() ).concatPlan( new RepeatPlan( getGliderLeft() ).reverse() );
-	let nextElement = battlePlan.getNextElement();
-
-	function getCobraPixels({ budget, generation, cols, rows }) {
-		if (generation === 1) {
-			// Verify dimensions, shouldn't change AFAWK
-			if (cols !== 100) {
-				alert(`cols === ${cols}`);
-			}
-			if (rows !== 400) {
-				alert(`rows === ${rows}`);
-			}
-		}
-		if (!nextElement) {
-			alert('No next element! :-O');
-		}
-
-		if (budget < nextElement.length) {
-			return [];
-		}
-
-		// We have budget for next element!
-		let el = nextElement;
-		nextElement = battlePlan.getNextElement();
-		return el;
-	}
-
-	setTimeout(function registerCobraArmy() {
-		window.registerArmy({
-			name: 'MC Cobra bot',
-			icon: 'cobra',
-			cb: getCobraPixels
-		});
-	}, 2000);
-
 	// --- Plan classes ---
 	class Plan {
 		constructor() {
@@ -101,6 +61,45 @@
 		}
 	}
 
+	// --- MC Cobra bot ---
+	
+	// Set up battle plan:
+	// For example, line of right gliders from left to right, then left gliders from right to left.
+	// Change as you wish
+	let battlePlan = new RepeatPlan( getGliderRight() ).concatPlan( new RepeatPlan( getGliderLeft() ).reverse() );
+	let nextElement = battlePlan.getNextElement();
+
+	function getCobraPixels({ budget, generation, cols, rows }) {
+		if (generation === 1) {
+			// Verify dimensions, shouldn't change AFAWK
+			if (cols !== 400) {
+				alert(`cols === ${cols}`);
+			}
+			if (rows !== 100) {
+				alert(`rows === ${rows}`);
+			}
+		}
+		if (!nextElement) {
+			alert('No next element! :-O');
+		}
+
+		if (budget < nextElement.length) {
+			return [];
+		}
+
+		// We have budget for next element!
+		let el = nextElement;
+		nextElement = battlePlan.getNextElement();
+		return el;
+	}
+
+	setTimeout(function registerCobraArmy() {
+		window.registerArmy({
+			name: 'MC Cobra bot',
+			icon: 'cobra',
+			cb: getCobraPixels
+		});
+	}, 2000);
 
 	// utilities ---------------------------------------------------------------------------------------------------------
 
