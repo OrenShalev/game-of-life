@@ -257,13 +257,13 @@
 			var audio = new Audio(that.settings.remotePlatformLocationRawGit + '/music/' + music.file);
 			audio.volume = music.volume;
 			audio.loop = true;
-			audio.play();
+			// audio.play();
 		};
 
 		that.playSound = function playSound(sound) {
 			var audio = new Audio(that.settings.remotePlatformLocationRawGit + '/sound/' + sound.file);
 			audio.volume = sound.volume;
-			audio.play();
+			// audio.play();
 		};
 
 		that.handleScore = function handleScore(scoringPixelsCount) {
