@@ -100,15 +100,26 @@
 		}
 	}
 
-	// --- MC Cobra bot ---
+	// --- 🐍🐍🐍 MC Cobra bot 🐍🐍🐍 ---
 	
 	// Set up battle plan:
 	// For example, line of right gliders from left to right, then left gliders from right to left.
 	// Change as you wish
 	let battlePlan = new RepeatPlan( getGliderRight() )
 		.concatPlan( new RepeatPlan( getGliderLeft() ).reverse() ).randomize();
-	let nextElement = battlePlan.getNextElement();
+	
+	let haPlan = new RepeatPlan(translatePixels(getHA(), [, 70]), 30)
+		.concatPlan(new RepeatPlan(getSpaceship(), 25))
+		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
+		.concatPlan(new RepeatPlan(getSpaceship(), 25))
+		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
+		.concatPlan(new RepeatPlan(getSpaceship(), 25))
+		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse())
+		.concatPlan(new RepeatPlan(getSpaceship(), 25))
+		.concatPlan(new RepeatPlan(getGliderRight(), 15).reverse());
+	battlePlan = haPlan;
 
+	let nextElement = battlePlan.getNextElement();
 	function cobraBite({ budget, generation, cols, rows }) {
 		if (generation === 1) {
 			// Verify dimensions, shouldn't change AFAWK
@@ -143,7 +154,7 @@
 		window.registerArmy({
 			name: 'MC Cobra',
 			icon: 'cobra',
-			cb: cobraBite
+			cb: cobraBite // 🐍
 		});
 	}, 2000);
 
@@ -315,6 +326,32 @@
 			2, 0,
 			2, 1,
 			1, 2
+		]);
+	}
+
+	function getSpaceship() {
+		return flatArrayToPixelsArray([
+			1, 0,
+			2, 0,
+			3, 0,
+			0, 1,
+			3, 1,
+			3, 2,
+			3, 3,
+			0, 4,
+			2, 4
+		]);
+	}
+
+	function getHA() {
+		return flatArrayToPixelsArray([
+			0, 0,
+			1, 1,
+			2, 2,
+			3, 3,
+			4, 3,
+			5, 3,
+			5, 2
 		]);
 	}
 
