@@ -1,7 +1,37 @@
+/*
+     MC COBRAS!                                  .o@*hu
+                        ..      .........   .u*"    ^Rc
+     Oren Shalev        oP""*Lo*#"""""""""""7d" .d*N.   $
+     Eyal Luzon        @  u@""           .u*" o*"   #L  ?b
+     Yair Barak       @   "              " .d"  .d@@e$   ?b.
+     Roy Kronenfeld 8                    @*@me@#         '"Nu
+                    @                                        '#b
+                  .P                                           $r
+                .@"                                  $L        $
+              .@"                                   8"R      dP
+           .d#"                                  .dP d"   .d#
+          xP              .e                 .ud#"  dE.o@"(
+          $             s*"              .u@*""     '""\dP"
+          ?L  ..                    ..o@""        .$  uP
+           #c:$"*u.             .u@*""$          uR .@"
+            ?L$. '"""***Nc    x@""   @"         d" JP
+             ^#$.        #L  .$     8"         d" d"
+               '          "b.'$.   @"         $" 8"
+                           '"*@$L $"         $  @
+                           @L    $"         d" 8\
+                           $$u.u$"         dF dF
+                           $ """   o      dP xR
+                           $      dFNu...@"  $
+                           "N..   ?B ^"""   :R
+                             """"* RL       d>
+                                    "$u.   .$
+                                      ^"*bo@"
+ */
 (function() {
 	// --- Plan classes ---
 	class Plan {
 		constructor() {
+			// So this is pretty low-level, but enough for our needs.
 			this.elements = [];
 			this.nextElementIdx = 0;
 		}
@@ -47,6 +77,15 @@
 		getRequiredBudget() {
 			return this.elements.reduce((budget, element) => budget + element.length, 0);
 		}
+
+		randomize() {
+			var arr = this.elements; // Just to make the code simpler.
+			for (let i = arr.length; i > 0; i--) {
+				let idx = Math.floor(Math.random() * i);
+				[ arr[i-1], arr[idx] ] = [ arr[idx], arr[i-1] ];
+			}
+			return this;
+		}
 	}
 
 	// Plan for a pattern that repeats horizontally from left to right.
@@ -66,10 +105,11 @@
 	// Set up battle plan:
 	// For example, line of right gliders from left to right, then left gliders from right to left.
 	// Change as you wish
-	let battlePlan = new RepeatPlan( getGliderRight() ).concatPlan( new RepeatPlan( getGliderLeft() ).reverse() );
+	let battlePlan = new RepeatPlan( getGliderRight() )
+		.concatPlan( new RepeatPlan( getGliderLeft() ).reverse() ).randomize();
 	let nextElement = battlePlan.getNextElement();
 
-	function getCobraPixels({ budget, generation, cols, rows }) {
+	function cobraBite({ budget, generation, cols, rows }) {
 		if (generation === 1) {
 			// Verify dimensions, shouldn't change AFAWK
 			if (cols !== 400) {
@@ -84,20 +124,26 @@
 		}
 
 		if (budget < nextElement.length) {
+			// No budget for next element, sit back and have a beer! 🍻
 			return [];
 		}
 
-		// We have budget for next element!
+		// We have budget for next element, go go go!
 		let el = nextElement;
+
+		if (!battlePlan.hasMoreElements()) {
+			battlePlan.reset();
+		}
 		nextElement = battlePlan.getNextElement();
+
 		return el;
 	}
 
 	setTimeout(function registerCobraArmy() {
 		window.registerArmy({
-			name: 'MC Cobra bot',
+			name: 'MC Cobra',
 			icon: 'cobra',
-			cb: getCobraPixels
+			cb: cobraBite
 		});
 	}, 2000);
 
