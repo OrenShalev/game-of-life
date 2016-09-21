@@ -27,12 +27,11 @@
 
 // translates an array of pixels. Create pattern starting at [0, 0], then pass to this to move to desired location.
     function translatePixels(pixels, columns, rows) {
-        return pixels.map(function translatePixel(pixel) {
-            return [
+        return pixels.map(pixel => [
                 pixel[0] + columns,
                 pixel[1] + rows
-            ];
-        });
+            ]
+        );
     }
 
 // gets pixels array of a blocker, starting at 0,0
