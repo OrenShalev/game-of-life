@@ -1,4 +1,106 @@
 (function() {
+	// --- MC Cobra bot ---
+	
+	// Set up battle plan:
+	// For example, line of right gliders from left to right, then left gliders from right to left.
+	// Change as you wish
+	let battlePlan = new RepeatPlan( getGliderRight() ).concatPlan( new RepeatPlan( getGliderLeft() ).reverse() );
+	let nextElement = battlePlan.getNextElement();
+
+	function getCobraPixels({ budget, generation, cols, rows }) {
+		if (generation === 1) {
+			// Verify dimensions, shouldn't change AFAWK
+			if (cols !== 100) {
+				alert(`cols === ${cols}`);
+			}
+			if (rows !== 400) {
+				alert(`rows === ${rows}`);
+			}
+		}
+		if (!nextElement) {
+			alert('No next element! :-O');
+		}
+
+		if (budget < nextElement.length) {
+			return [];
+		}
+
+		// We have budget for next element!
+		let el = nextElement;
+		nextElement = battlePlan.getNextElement();
+		return el;
+	}
+
+	setTimeout(function registerCobraArmy() {
+		window.registerArmy({
+			name: 'MC Cobra bot',
+			icon: 'cobra',
+			cb: getCobraPixels
+		});
+	}, 2000);
+
+	// --- Plan classes ---
+	class Plan {
+		constructor() {
+			this.elements = [];
+			this.nextElementIdx = 0;
+		}
+
+		getElements() {
+			return this.elements;
+		}
+
+		addElements(elements) {
+			this.elements.push(...elements);
+			return this;
+		}
+
+		concatPlan(otherPlan) {
+			this.addElements(otherPlan.getElements());
+			return this;
+		}
+
+		hasMoreElements() {
+			return this.nextElementIdx < this.elements.length;
+		}
+
+		getNextElement() {
+			return this.elements[this.nextElementIdx++];
+		}
+
+		reverse() {
+			this.elements.reverse();
+			return this;
+		}
+
+		randomizeStartElement() {
+			let startAt = Math.floor(Math.random() * this.elements.length);
+			this.elements = this.elements.slice(startAt).concat(this.elements.slice(0, startAt));
+			return this;
+		}
+
+		reset() {
+			this.nextElementIdx = 0;
+			return this;
+		}
+
+		getRequiredBudget() {
+			return this.elements.reduce((budget, element) => budget + element.length, 0);
+		}
+	}
+
+	// Plan for a pattern that repeats horizontally from left to right.
+	class RepeatPlan extends Plan {
+		constructor(pattern = [], repeatEveryXPixels = 10) {
+			super();
+			let elements = [];
+			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO 400?
+				elements.push(translatePixels(pattern, [x, 0]));
+			}
+			this.addElements(elements);
+		}
+	}
+
 
 	// utilities ---------------------------------------------------------------------------------------------------------
 
@@ -8,7 +110,7 @@
 
 	// structures --------------------------------------------------------------------------------------------------------
 
-function tryPlaceGlider(data) {
+	function tryPlaceGlider(data) {
 
 	var pixels = [];
 		if (data.budget >= 5) {
@@ -83,7 +185,7 @@ function tryPlaceGlider(data) {
 
 	// bot --------------------------------------------------------------------------------------------------------------
 
-	var bot = function bot(data) {
+	var botOrig = function bot(data) {
 		
 		if (lastCol > 400) {
 			sideFlag = 1;
@@ -106,109 +208,6 @@ function tryPlaceGlider(data) {
 
 	var sideFlag = 0;
 	var lastCol = 0;
-    var bot = {name: 'HA-Oren!', icon:'bot', cb: planBotCB};
-
-	setTimeout(function registerArmy() {
-		window.registerArmy({
-			name: bot.name,
-			icon: bot.icon,
-			cb: bot.cb
-		});
-	}, 2000);
-
-	////////
-
-
-
-	function planBotCB({budget, generation, cols, rows}) {
-		if (budget >= nextElement.length) {
-			let el = nextElement;
-			nextElement = battlePlan.getNextElement();
-			return el;
-		}
-		else {
-			return [];
-		}
-	}
-	// let botbot = { name: };
-
-	class Plan {
-		// this.elements = [];
-		constructor() {
-			this.elements = [];
-			this.nextElementIdx = 0;
-		}
-
-		getElements() {
-			return this.elements;
-		}
-
-		addElements(elements) {
-			this.elements.push(...elements);
-			return this;
-		}
-
-		concatPlan(otherPlan) {
-			this.addElements(otherPlan.getElements());
-			return this;
-		}
-
-		hasMoreElements() {
-			return this.nextElementIdx < this.elements.length;
-		}
-
-		getNextElement() {
-			return this.elements[this.nextElementIdx++];
-		}
-
-		reverse() {
-			this.elements.reverse();
-			return this;
-		}
-
-		randomizeStartElement() {
-			let startAt = Math.floor(Math.random() * this.elements.length);
-			this.elements = this.elements.slice(startAt).concat(this.elements.slice(0, startAt));
-			return this;
-		}
-
-		reset() {
-			this.nextElementIdx = 0;
-			return this;
-		}
-
-		getRequiredBudget() {
-			return this.elements.reduce((element, pixels) => pixels.concat(element), []).length
-		}
-	}
-
-	// Plan for a pattern that repeats horizontally from left to right.
-	class RepeatPlan extends Plan {
-		constructor(pattern = [], repeatEveryXPixels = 10) {
-			super();
-			let elements = [];
-			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO 400?
-				elements.push(translatePixels(pattern, x, 0));
-			}
-			this.addElements(elements);
-		}
-	}
-	
-	class GliderRightLine extends RepeatPlan {
-		constructor() {
-			super(getGliderRight(), 100);
-		}
-
-	}
-
-	let p = new RepeatPlan(getGliderRight()).concatPlan(new RepeatPlan(getGliderLeft()).reverse());
-	// let p = new GliderRightLine().concatPlan(new GliderRightLine().reverse());
-	debugger;
-
-	// init plan
-	let battlePlan__ = new GliderRightLine().concatPlan(new GliderRightLine().reverse()); // change as you wish
-	let battlePlan = new RepeatPlan(getGliderRight()).concatPlan(new RepeatPlan(getGliderLeft()).reverse()); // change as you wish
-	let nextElement = battlePlan.getNextElement();
 
 	// Helper functions I (Oren) found useful. Currently as a separate file. I suggest that anyone who works on a file
 // copy-pastes this, I think it can only make our lives easier. When someone copies a file and changes it -- these
@@ -235,13 +234,12 @@ function tryPlaceGlider(data) {
 	}
 
 // translates an array of pixels. Create pattern starting at [0, 0], then pass to this to move to desired location.
-	function translatePixels(pixels, columns = 0, rows = 0) {
-		return pixels.map(function translatePixel(pixel) {
-			return [
-				pixel[0] + columns,
-				pixel[1] + rows
-			];
-		});
+	function translatePixels(pixels, [deltaCols = 0, deltaRows = 0] = []) {
+		return pixels.map( ([col, row]) =>
+			[
+				col + deltaCols,
+				row + deltaRows
+			]);
 	}
 
 // gets pixels array of a blocker, starting at 0,0
