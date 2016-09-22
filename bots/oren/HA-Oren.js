@@ -130,7 +130,7 @@
 	let battlePlan = new LinePlan( getGliderRight() )
 		.concatPlan( new LinePlan( getGliderLeft() ).reverse() ).randomize();
 
-	var haElement = translatePixels(getHA(), [, 70]); // HA element at col 0 (default) and row 70
+	var haElement = translatePixels(getMultum(), [, 70]); // HA element at col 0 (default) and row 70
 	let haDefense = new LinePlan(haElement, 30);
 	let haAttack = new LinePlan(getSpaceship(), 25).concatPlan(
 		new LinePlan(getGliderRight(), 15).reverse()
@@ -364,7 +364,7 @@
 		]);
 	}
 
-	function getHA() {
+	function getMultum() {
 		return flatArrayToPixelsArray([
 			0, 0,
 			1, 1,
