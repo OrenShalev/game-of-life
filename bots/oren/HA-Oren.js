@@ -114,7 +114,13 @@
 
 	// Plan for a pattern that repeats horizontally from left to right.
 	class LinePlan extends Plan {
-		constructor( { pattern = [], repeatEveryXPixels = 10 } = {} ) {
+		constructor( {
+			pattern = [],
+			repeatEveryXPixels = 10,
+			varianceX = ()=>0,
+			varianceY = ()=>0
+		} = {} ) {
+
 			super();
 			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO edges of board etc.
 				this.elements.push(translatePixels(pattern, [x, ]));
@@ -140,7 +146,7 @@
 
 	//////
 	let multumLine = new LinePlan( { pattern: translatePixels(getMultum(), [, 70]), repeatEveryXPixels: 30 } ).randomize();
-	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [35]), repeatEveryXPixels: 20 } ); // TODO: pi randomize row 10-35
+	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [35]), repeatEveryXPixels: 20, varianceY: () => getRnd(10, 35) } );
 	let attackLine = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
 	let loopIteration = Plan.concat(piLine, attackLine);
 	let mainLoop = Plan.loop(loopIteration, 100);
