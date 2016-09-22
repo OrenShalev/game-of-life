@@ -114,7 +114,7 @@
 
 	// Plan for a pattern that repeats horizontally from left to right.
 	class LinePlan extends Plan {
-		constructor(pattern = [], repeatEveryXPixels = 10) {
+		constructor( { pattern = [], repeatEveryXPixels = 10 } = {} ) {
 			super();
 			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO edges of board etc.
 				this.elements.push(translatePixels(pattern, [x, ]));
@@ -127,21 +127,21 @@
 	// Set up battle plan:
 	// For example, line of right gliders from left to right, then left gliders from right to left.
 	// Change as you wish
-	let battlePlan = new LinePlan( getGliderRight() )
-		.concatPlan( new LinePlan( getGliderLeft() ).reverse() ).randomize();
+	// let battlePlan = new LinePlan( getGliderRight() )
+	// 	.concatPlan( new LinePlan( getGliderLeft() ).reverse() ).randomize();
 
 	var haElement = translatePixels(getMultum(), [, 70]); // HA element at col 0 (default) and row 70
-	let haDefense = new LinePlan(haElement, 30);
-	let haAttack = new LinePlan(getSpaceship(), 25).concatPlan(
-		new LinePlan(getGliderRight(), 15).reverse()
+	let haDefense = new LinePlan( { pattern: haElement, repeatEveryXPixels: 30 } );
+	let haAttack = new LinePlan( { pattern: getSpaceship(), repeatEveryXPixels: 25 } ).concatPlan(
+		new LinePlan( { pattern: getGliderRight(), repeatEveryXPixels: 15 } ).reverse()
 	);
 	let haAttackLoop = Plan.loop(haAttack, 10);
 	let haPlan = Plan.concat(haDefense, haAttackLoop);
 
 	//////
-	let multumLine = new LinePlan(translatePixels(getMultum(), [, 70]), 30).randomize();
-	let piLine = new LinePlan(translatePixels(getPi(), [35]), 20); // TODO: pi randomize row 10-35
-	let attackLine = new LinePlan(getSpcecial, 20).reverse();
+	let multumLine = new LinePlan( { pattern: translatePixels(getMultum(), [, 70]), repeatEveryXPixels: 30 } ).randomize();
+	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [35]), repeatEveryXPixels: 20 } ); // TODO: pi randomize row 10-35
+	let attackLine = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
 	let loopIteration = Plan.concat(piLine, attackLine);
 	let mainLoop = Plan.loop(loopIteration, 100);
 	let ha2 = Plan.concat(multumLine, mainLoop);
