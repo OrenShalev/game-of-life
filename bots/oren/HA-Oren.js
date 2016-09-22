@@ -140,9 +140,9 @@
 
 	//////
 	let multumLine = new LinePlan(translatePixels(getMultum(), [, 70]), 30).randomize();
-	let boomLine = new LinePlan(translatePixels(getBoom(), [35]), 20); // TODO: boom randomize row 10-35
+	let piLine = new LinePlan(translatePixels(getPi(), [35]), 20); // TODO: pi randomize row 10-35
 	let attackLine = new LinePlan(getSpcecial, 20).reverse();
-	let loopIteration = Plan.concat(boomLine, attackLine);
+	let loopIteration = Plan.concat(piLine, attackLine);
 	let mainLoop = Plan.loop(loopIteration, 100);
 	let ha2 = Plan.concat(multumLine, mainLoop);
 	//////
