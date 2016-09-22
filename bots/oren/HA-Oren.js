@@ -1,10 +1,10 @@
 /*
-     MC COBRAS!                                  .o@*hu
-                        ..      .........   .u*"    ^Rc
-     Oren Shalev        oP""*Lo*#"""""""""""7d" .d*N.   $
-     Eyal Luzon        @  u@""           .u*" o*"   #L  ?b
-     Yair Barak       @   "              " .d"  .d@@e$   ?b.
-     Roy Kronenfeld 8                    @*@me@#         '"Nu
+   MC COBRAS!                                    .o@*hu
+   ------------         ..      .........   .u*"    ^Rc
+   Oren Shalev          oP""*Lo*#"""""""""""7d" .d*N.   $
+   Eyal Luzon          @  u@""           .u*" o*"   #L  ?b
+   Yair Barak         @   "              " .d"  .d@@e$   ?b.
+   Roy Kronenfeld   8                    @*@me@#         '"Nu
                     @                                        '#b
                   .P                                           $r
                 .@"                                  $L        $
@@ -29,56 +29,62 @@
  */
 (function() {
 	// --- Plan classes ---
+
+	/**
+	 * A plan is a list of elements we intend to place on the board one by one.
+	 * Operations on a plan returns the plan, to enable chaining.
+	 * TODO: refactor to generator. Would be nicer code plus allow for "infinite plans", but
+	 * some stuff like 'randomize' implementation get trickier. 🤔
+	 */
 	class Plan {
 		constructor() {
-			// So this is pretty low-level, but enough for our needs.
+			// So using an array is pretty low-level, but enough for our needs.
 			this.elements = [];
 			this.nextElementIdx = 0;
 		}
 
+		// -- Methods for getting data about the plan --
+		hasMoreElements() {
+			return this.nextElementIdx < this.elements.length;
+		}
+		getNextElement() {
+			return this.elements[this.nextElementIdx++];
+		}
 		getElements() {
 			return this.elements;
 		}
-
-		addElements(elements) {
-			this.elements.push(...elements);
-			return this;
+		getRequiredBudget() { // Required budget is number of pixels, equals to sum of element lengths.
+			return this.elements.reduce((budget, element) => budget + element.length, 0);
 		}
 
+		// -- Plan operations, change 'this', and return it for chaining. --
+		// - Basic stuff: -
+		reset() {
+			this.nextElementIdx = 0;
+			return this;
+		}
+		addElements(elements) {
+			this.elements.push(...elements); // TODO: this is a shallow copy, fine only provided that we don't mutate elements/pixels.
+			return this;
+		}
 		concatPlan(otherPlan) {
 			this.addElements(otherPlan.getElements());
 			return this;
 		}
 
-		hasMoreElements() {
-			return this.nextElementIdx < this.elements.length;
-		}
-
-		getNextElement() {
-			return this.elements[this.nextElementIdx++];
-		}
-
+		// - Higher level: -
 		reverse() {
 			this.elements.reverse();
 			return this;
 		}
-
 		randomizeStartElement() {
-			let startAt = Math.floor(Math.random() * this.elements.length);
-			this.elements = this.elements.slice(startAt).concat(this.elements.slice(0, startAt));
+			var arr = this.elements; // Just to make the code simpler.
+			let startAt = Math.floor(Math.random() * arr.length);
+			this.elements = arr.slice(startAt).concat(arr.slice(0, startAt));
 			return this;
 		}
-
-		reset() {
-			this.nextElementIdx = 0;
-			return this;
-		}
-
-		getRequiredBudget() {
-			return this.elements.reduce((budget, element) => budget + element.length, 0);
-		}
-
 		randomize() {
+			// Simple array shuffle.
 			var arr = this.elements; // Just to make the code simpler.
 			for (let i = arr.length; i > 0; i--) {
 				let idx = Math.floor(Math.random() * i);
@@ -86,23 +92,14 @@
 			}
 			return this;
 		}
-
 		loop(times = 3) {
-			let plan = new Plan();
 			for (let i = 0; i < times; i++) {
-				plan.concatPlan(this);
+				this.concatPlan(this);
 			}
-			return plan;
+			return this;
 		}
 
-		static loop(plan = new Plan(), times = 3) {
-			let newPlan = new Plan();
-			for (let i = 0; i < times; i++) {
-				newPlan.concatPlan(plan);
-			}
-			return newPlan;
-		}
-
+		// -- Static methods, enable nicer code when creating new plans from existing ones. --
 		static concat(...plans) {
 			let newPlan = new Plan();
 			for (let plan of plans) {
@@ -110,17 +107,18 @@
 			}
 			return newPlan;
 		}
+		static loop(plan = new Plan(), times = 3) {
+			return Plan.concat(...new Array(times).fill(plan));
+		}
 	}
 
 	// Plan for a pattern that repeats horizontally from left to right.
-	class RepeatPlan extends Plan {
+	class LinePlan extends Plan {
 		constructor(pattern = [], repeatEveryXPixels = 10) {
 			super();
-			let elements = [];
-			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO 400?
-				elements.push(translatePixels(pattern, [x, 0]));
+			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO edges of board etc.
+				this.elements.push(translatePixels(pattern, [x, ]));
 			}
-			this.addElements(elements);
 		}
 	}
 
@@ -129,12 +127,13 @@
 	// Set up battle plan:
 	// For example, line of right gliders from left to right, then left gliders from right to left.
 	// Change as you wish
-	let battlePlan = new RepeatPlan( getGliderRight() )
-		.concatPlan( new RepeatPlan( getGliderLeft() ).reverse() ).randomize();
-	
-	let haDefense = new RepeatPlan(translatePixels(getHA(), [, 70]), 30);
-	let haAttack = new RepeatPlan(getSpaceship(), 25).concatPlan(
-		new RepeatPlan(getGliderRight(), 15).reverse()
+	let battlePlan = new LinePlan( getGliderRight() )
+		.concatPlan( new LinePlan( getGliderLeft() ).reverse() ).randomize();
+
+	var haElement = translatePixels(getHA(), [, 70]); // HA element at col 0 (default) and row 70
+	let haDefense = new LinePlan(haElement, 30);
+	let haAttack = new LinePlan(getSpaceship(), 25).concatPlan(
+		new LinePlan(getGliderRight(), 15).reverse()
 	);
 	let haAttackLoop = Plan.loop(haAttack, 10);
 	let haPlan = Plan.concat(haDefense, haAttackLoop);
@@ -144,6 +143,8 @@
 	let nextElement = battlePlan.getNextElement();
 	function cobraBite({ budget, generation, cols, rows }) {
 		if (generation === 1) {
+			battlePlan.reset();
+
 			// Verify dimensions, shouldn't change AFAWK
 			if (cols !== 400) {
 				alert(`cols === ${cols}`);
@@ -151,9 +152,6 @@
 			if (rows !== 100) {
 				alert(`rows === ${rows}`);
 			}
-		}
-		if (!nextElement) {
-			alert('No next element! :-O');
 		}
 
 		if (budget < nextElement.length) {
