@@ -151,12 +151,24 @@
 */
 
 	//////
-	let multumLine = new LinePlan( { pattern: translatePixels(getMultum(), [, 70]), repeatEveryXPixels: 30 } ).randomize();
-	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [, 35]), repeatEveryXPixels: 20, varianceY: () => getRnd(10, 35) } );
+	let multumLine = new LinePlan( {
+		pattern: translatePixels(getMultum(), [, 70]),
+		repeatEveryXPixels: 30
+	} ).randomize();
+
+	// Line of pi, RTL.
+	let piLine = new LinePlan( {
+		pattern: translatePixels(getPi(), [, 35]),
+		repeatEveryXPixels: 20,
+		varianceY: () => getRnd(10, 35)
+	} ).reverse();
+
 	// let notGood = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
 
 	let attackLine = new Plan(), x = 0;
 	while (true) {
+		// Line of gliders-spaceships, LTR, until no more room. 
+
 		if (x >= COLS) break;
 		attackLine.addElements([translatePixels( getGliderLeft(), [x, ] )]);
 		x += 20;
@@ -226,120 +238,7 @@
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
-	// structures --------------------------------------------------------------------------------------------------------
-
-	function tryPlaceGlider(data) {
-
-	var pixels = [];
-		if (data.budget >= 5) {
-			
-			var c = lastCol;
-			var r = 0;
-
-			pixels.push([c, r]);
-			pixels.push([c+1, r]);
-			pixels.push([c+2, r]);
-			pixels.push(sideFlag ? [c, r+1] : [c+2, r+1]);
-			pixels.push([c+1, r+2]);
-
-			if (sideFlag == 0) {
-				lastCol += 15;
-			} else {
-				lastCol -= 15;
-			}
-		}
-		return pixels;
-	}
-
-	function tryPlaceSpaceship(data) {
-		var pixels = [];
-		if (data.budget >= 9) {
-			
-			var c = lastCol;
-			var r = 0;
-			
-			pixels.push([c+1, r]);
-			pixels.push([c+2, r]);
-			pixels.push([c+3, r]);
-			pixels.push([c, r+1]);
-			pixels.push([c+3, r+1]);
-			pixels.push([c+3, r+2]);
-			pixels.push([c+3, r+3]);
-			pixels.push([c, r+4]);
-			pixels.push([c+2, r+4]);
-
-			if (sideFlag == 0) {
-				lastCol += 25;
-			} else {
-				lastCol -= 25;
-			}
-		}
-		return pixels;
-	}
-
-	function tryPlaceHaSecret(data) {
-		var pixels = [];
-		if (data.budget >= 7) {
-			
-			var c = lastCol;
-			var r = 70;
-
-			pixels.push([c, r]);
-			pixels.push([c+1, r-1]);
-			pixels.push([c+2, r-2]);
-			pixels.push([c+3, r-3]);
-			pixels.push([c+4, r-3]);
-			pixels.push([c+5, r-3]);
-			pixels.push([c+5, r-2]);
-
-			if (lastCol > 400) {
-				lastCol = 0
-			} else {
-				lastCol += 30;
-			}
-		}
-		return pixels;
-	}
-
-	// bot --------------------------------------------------------------------------------------------------------------
-
-	var botOrig = function bot(data) {
-		
-		if (lastCol > 400) {
-			sideFlag = 1;
-		} else if (lastCol < 0) {
-			sideFlag = 0;
-		}
-
-		var pixels = [];
-		if (data.generation < 100) {
-			pixels = tryPlaceHaSecret(data);
-		} else if (sideFlag == 0) {
-			pixels = tryPlaceSpaceship(data);
-		} else {
-			pixels = tryPlaceGlider(data);
-		}
-		return pixels;
-	};
-
-	// init --------------------------------------------------------------------------------------------------------------
-
-	var sideFlag = 0;
-	var lastCol = 0;
-
-	// Helper functions I (Oren) found useful. Currently as a separate file. I suggest that anyone who works on a file
-// copy-pastes this, I think it can only make our lives easier. When someone copies a file and changes it -- these
-// will be there and we won't need to copy this.
-
-	var rnd = Math.random,
-		floor = Math.floor;
-
-// random int between 'from' and 'to'-1. For example, randomIntRange(0, 10) returns int between 0 and 9, (20, 60)-->20..59.
-	function randomIntInRange(from, to) {
-		return floor(rnd() * (to - from - 1)) + from;
-	}
-
-// lets you create array of arrays easily: flatArrayToPixelsArray([0, 1, 2, 3]) --> [ [0, 1], [2, 3] ]
+	// lets you create array of arrays easily: flatArrayToPixelsArray([0, 1, 2, 3]) --> [ [0, 1], [2, 3] ]
 	function flatArrayToPixelsArray(flat) {
 		var pixels = [];
 		for (var i = 0; i < flat.length; i = i + 2) {
@@ -351,7 +250,7 @@
 		return pixels;
 	}
 
-// translates an array of pixels. Create pattern starting at [0, 0], then pass to this to move to desired location.
+	// translates an array of pixels. Create pattern starting at [0, 0], then pass to this to move to desired location.
 	function translatePixels(pixels, [deltaCols = 0, deltaRows = 0] = []) {
 		return pixels.map( ([col, row]) =>
 			[
@@ -360,17 +259,9 @@
 			]);
 	}
 
-// gets pixels array of a blocker, starting at 0,0
-	function getBlocker() {
-		return flatArrayToPixelsArray([
-			0, 0,
-			0, 1,
-			1, 0,
-			1, 1
-		]);
-	}
+	// Structures. All structures start at 0,0; translate as needed.
 
-// gets pixels array of a blocker which will move right, starting at 0,0
+	// gets pixels array of a glider which will move right.
 	function getGliderLeft() {
 		return flatArrayToPixelsArray([
 			0, 0,
@@ -380,7 +271,7 @@
 			1, 2
 		]);
 	}
-// gets pixels array of a blocker which will move left, starting at 0,0
+	// gets pixels array of a glider which will move left.
 	function getGliderRight() {
 		return flatArrayToPixelsArray([
 			0, 0,
@@ -418,7 +309,7 @@
 	}
 
 	function getPi() {
-		// return 3.14
+		// return 3.14; :-P
 		return flatArrayToPixelsArray([
 			0, 0,
 			0, 1,
