@@ -28,6 +28,7 @@
                                       ^"*bo@"
  */
 (function() {
+	const COLS = 400;
 	// --- Plan classes ---
 
 	/**
@@ -125,7 +126,7 @@
 		} = {} ) {
 
 			super();
-			for (let x = 0; x < 400; x += repeatEveryXPixels) { // TODO edges of board etc.
+			for (let x = 0; x < COLS; x += repeatEveryXPixels) { // TODO edges of board etc.
 				this.elements.push(translatePixels(pattern, [x, ]));
 			}
 		}
@@ -139,6 +140,7 @@
 	// let battlePlan = new LinePlan( getGliderRight() )
 	// 	.concatPlan( new LinePlan( getGliderLeft() ).reverse() ).randomize();
 
+/*
 	var haElement = translatePixels(getMultum(), [, 70]); // HA element at col 0 (default) and row 70
 	let haDefense = new LinePlan( { pattern: haElement, repeatEveryXPixels: 30 } );
 	let haAttack = new LinePlan( { pattern: getSpaceship(), repeatEveryXPixels: 25 } ).concatPlan(
@@ -146,19 +148,38 @@
 	);
 	let haAttackLoop = Plan.loop(haAttack, 10);
 	let haPlan = Plan.concat(haDefense, haAttackLoop);
+*/
 
 	//////
 	let multumLine = new LinePlan( { pattern: translatePixels(getMultum(), [, 70]), repeatEveryXPixels: 30 } ).randomize();
-	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [35]), repeatEveryXPixels: 20, varianceY: () => getRnd(10, 35) } );
-	let attackLine = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
+	let piLine = new LinePlan( { pattern: translatePixels(getPi(), [, 35]), repeatEveryXPixels: 20, varianceY: () => getRnd(10, 35) } );
+	// let notGood = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
+
+	let attackLine = new Plan(), x = 0;
+	while (true) {
+		if (x >= COLS) break;
+		attackLine.addElements([translatePixels( getGliderLeft(), [x, ] )]);
+		x += 20;
+
+		if (x >= COLS) break;
+		attackLine.addElements([translatePixels( getSpaceship(), [x, ] )]);
+		x += 30;
+
+		if (x >= COLS) break;
+		attackLine.addElements([translatePixels( getGliderRight(), [x, ] )]);
+		x += 20;
+
+		if (x >= COLS) break;
+		attackLine.addElements([translatePixels( getSpaceship(), [x, ] )]);
+		x += 30;
+	}
+
 	let loopIteration = Plan.concat(piLine, attackLine);
 	let mainLoop = Plan.loop(loopIteration, 100);
 	let ha2 = Plan.concat(multumLine, mainLoop);
-	//////
-	// TODO: special means: glider right, spaceship, glider left, spaceship. space between is 20/30/20/30/...
 
-	battlePlan = haPlan;
-	// battlePlan = ha2;
+	// let battlePlan = haPlan;
+	let battlePlan = ha2;
 	let nextElement;
 
 	function cobraBite({ budget, generation, cols, rows }) {
@@ -167,7 +188,7 @@
 			nextElement = battlePlan.getNextElement();
 
 			// Verify dimensions, shouldn't change AFAWK
-			if (cols !== 400) {
+			if (cols !== COLS) {
 				alert(`cols === ${cols}`);
 			}
 			if (rows !== 100) {
@@ -393,6 +414,19 @@
 			4, 3,
 			5, 3,
 			5, 2
+		]);
+	}
+
+	function getPi() {
+		// return 3.14
+		return flatArrayToPixelsArray([
+			0, 0,
+			0, 1,
+			0, 2,
+			1, 2,
+			2, 2,
+			2, 1,
+			2, 0
 		]);
 	}
 
