@@ -139,11 +139,12 @@
 	let haPlan = Plan.concat(haDefense, haAttackLoop);
 
 	battlePlan = haPlan;
+	let nextElement;
 
-	let nextElement = battlePlan.getNextElement();
 	function cobraBite({ budget, generation, cols, rows }) {
 		if (generation === 1) {
 			battlePlan.reset();
+			nextElement = battlePlan.getNextElement();
 
 			// Verify dimensions, shouldn't change AFAWK
 			if (cols !== 400) {
