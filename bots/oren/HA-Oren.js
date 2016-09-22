@@ -56,6 +56,9 @@
 		getRequiredBudget() { // Required budget is number of pixels, equals to sum of element lengths.
 			return this.elements.reduce((budget, element) => budget + element.length, 0);
 		}
+		toString() {
+			return `Plan with ${this.elements.length} elements, totaling ${this.getRequiredBudget()} pixels.`;
+		}
 
 		// -- Plan operations, change 'this', and return it for chaining. --
 		// - Basic stuff: -
