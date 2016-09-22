@@ -138,7 +138,18 @@
 	let haAttackLoop = Plan.loop(haAttack, 10);
 	let haPlan = Plan.concat(haDefense, haAttackLoop);
 
+	//////
+	let multumLine = new LinePlan(translatePixels(getMultum(), [, 70]), 30).randomize();
+	let boomLine = new LinePlan(translatePixels(getBoom(), [35]), 20); // TODO: boom randomize row 10-35
+	let attackLine = new LinePlan(getSpcecial, 20).reverse();
+	let loopIteration = Plan.concat(boomLine, attackLine);
+	let mainLoop = Plan.loop(loopIteration, 100);
+	let ha2 = Plan.concat(multumLine, mainLoop);
+	//////
+	// TODO: special means: glider right, spaceship, glider left, spaceship. space between is 20/30/20/30/...
+
 	battlePlan = haPlan;
+	// battlePlan = ha2;
 	let nextElement;
 
 	function cobraBite({ budget, generation, cols, rows }) {
