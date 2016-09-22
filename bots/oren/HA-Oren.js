@@ -79,16 +79,16 @@
 		}
 		randomizeStartElement() {
 			var arr = this.elements; // Just to make the code simpler.
-			let startAt = Math.floor(Math.random() * arr.length);
+			let startAt = getRnd(0, arr.length - 1);
 			this.elements = arr.slice(startAt).concat(arr.slice(0, startAt));
 			return this;
 		}
 		randomize() {
 			// Simple array shuffle.
 			var arr = this.elements; // Just to make the code simpler.
-			for (let i = arr.length; i > 0; i--) {
-				let idx = Math.floor(Math.random() * i);
-				[ arr[i-1], arr[idx] ] = [ arr[idx], arr[i-1] ]; // Simple swap.
+			for (let i = arr.length - 1; i >= 0; i--) {
+				let idx = getRnd(0, i);
+				[ arr[i], arr[idx] ] = [ arr[idx], arr[i] ]; // Simple swap.
 			}
 			return this;
 		}
@@ -180,7 +180,7 @@
 
 	// utilities ---------------------------------------------------------------------------------------------------------
 
-	function getRnd(min, max) {
+	function getRnd(min = 0, max = 1) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
 
