@@ -121,13 +121,13 @@
 		constructor( {
 			pattern = [],
 			repeatEveryXPixels = 10,
-			varianceX = ()=>0,
-			varianceY = ()=>0
+			varianceCol = ()=>0,
+			varianceRow = ()=>0
 		} = {} ) {
 
 			super();
 			for (let x = 0; x < COLS; x += repeatEveryXPixels) { // TODO edges of board etc.
-				this.elements.push(translatePixels(pattern, [x, ]));
+				this.elements.push(translatePixels(pattern, [x + varianceCol(), varianceRow()]));
 			}
 		}
 	}
@@ -160,7 +160,7 @@
 	let piLine = new LinePlan( {
 		pattern: translatePixels(getPi(), [, 35]),
 		repeatEveryXPixels: 20,
-		varianceY: () => getRnd(10, 35)
+		varianceRow: () => getRnd(10, 35)
 	} ).reverse();
 
 	// let notGood = new LinePlan( { pattern: getSpcecial(), repeatEveryXPixels: 20 } ).reverse();
@@ -314,7 +314,7 @@
 			0, 0,
 			0, 1,
 			0, 2,
-			1, 2,
+			1, 0,
 			2, 2,
 			2, 1,
 			2, 0
